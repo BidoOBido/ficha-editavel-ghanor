@@ -374,16 +374,10 @@ textarea:focus {
   box-shadow: inset 4px 0 0 var(--gold);
 }
 
-.lower-grid {
-  display: grid;
-  grid-template-columns: 1.25fr 1fr;
-  gap: 16px;
-}
-
 .defense-total {
   display: grid;
-  grid-template-columns: 74px auto repeat(5, minmax(58px, 1fr) auto);
-  gap: 6px;
+  grid-template-columns: 74px auto repeat(5, minmax(72px, 1fr) auto);
+  gap: 8px;
   align-items: end;
 }
 
@@ -421,8 +415,8 @@ textarea:focus {
 
 .armor-lines {
   display: grid;
-  grid-template-columns: 2fr 0.8fr 0.8fr;
-  gap: 8px;
+  grid-template-columns: minmax(180px, 2fr) minmax(90px, 0.7fr) minmax(90px, 0.7fr);
+  gap: 10px;
 }
 
 .skills-panel {
@@ -596,10 +590,6 @@ textarea:focus {
 
   html {
     scroll-padding-top: 0;
-  }
-
-  .lower-grid {
-    grid-template-columns: 1fr;
   }
 
   .name-panel {
