@@ -86,6 +86,10 @@
     return Math.min(Math.max(Math.trunc(calcNumber(value)), min), max);
   }
 
+  function clampNumber(value, min, max) {
+    return Math.min(Math.max(calcNumber(value), min), max);
+  }
+
   function normalizeList(value, normalizer) {
     return Array.isArray(value) ? value.slice(0, MAX_LIST_ITEMS).map(normalizer) : [];
   }
@@ -193,7 +197,7 @@
     return {
       name: cleanText(source.name, MAX_SHORT_TEXT_LENGTH),
       quantity: clampInteger(source.quantity ?? 1, 0, 999),
-      spaces: clampInteger(source.spaces, 0, 999),
+      spaces: clampNumber(source.spaces, 0, 999),
       value: cleanText(source.value, MAX_SHORT_TEXT_LENGTH)
     };
   }

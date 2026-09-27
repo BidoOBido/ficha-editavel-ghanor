@@ -4,7 +4,7 @@
   function create({ attributes, calc, labelHints }) {
     function field(path, label, value, type = "text", options = {}) {
       const numberAttrs = type === "number"
-        ? ` min="${options.min ?? -999}" max="${options.max ?? 9999}" step="1"`
+        ? ` min="${options.min ?? -999}" max="${options.max ?? 9999}" step="${options.step ?? 1}"`
         : "";
       const hint = labelHints[label];
       const title = hint ? ` title="${escapeAttr(hint)}"` : "";
@@ -173,7 +173,7 @@
             ${rowActions("equipment", index)}
             ${field(`equipment.${index}.name`, "Item", item.name, "text", { grid: true })}
             ${field(`equipment.${index}.quantity`, "Qtd.", item.quantity, "number", { min: 0, max: 999, grid: true })}
-            ${field(`equipment.${index}.spaces`, "Esp.", item.spaces, "number", { min: 0, max: 999, grid: true })}
+            ${field(`equipment.${index}.spaces`, "Esp.", item.spaces, "number", { min: 0, max: 999, step: 0.01, grid: true })}
             ${field(`equipment.${index}.value`, "Valor (PP)", item.value, "text", { grid: true })}
             ${removeButton("equipment", index)}
           </article>

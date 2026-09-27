@@ -229,3 +229,20 @@ test("importacao limita numeros ao intervalo da interface", () => {
   assert.equal(imported.money.bronze, 0);
   assert.equal(imported.money.silver, 999999);
 });
+
+test("importacao preserva espacos fracionarios de equipamento", () => {
+  const data = loadData();
+  const calc = loadCalculations();
+  const imported = data.mergeCharacter(data.blankCharacter(), {
+    equipment: [
+      { name: "Acido", quantity: 2, spaces: 0.5 },
+      { name: "Virotes", quantity: 13, spaces: 0.05 },
+      { name: "Balsamo", quantity: 2, spaces: "0.5" }
+    ]
+  });
+
+  assert.equal(imported.equipment[0].spaces, 0.5);
+  assert.equal(imported.equipment[1].spaces, 0.05);
+  assert.equal(imported.equipment[2].spaces, 0.5);
+  assert.equal(calc.loadUsed(imported), 2.65);
+});
