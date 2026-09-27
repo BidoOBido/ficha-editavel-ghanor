@@ -7,13 +7,13 @@
     <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
-    <header class="app-bar no-print">
+    <header class="app-bar">
       <div>
         <p class="eyebrow">A Lenda de Ghanor RPG</p>
         <h1>Ficha de Personagem</h1>
+        <p class="permission-text">É permitido reproduzir esta página para uso pessoal. Em troca, visite-nos em jamboeditora.com.br.</p>
       </div>
-      <nav class="toolbar" aria-label="Ações da ficha">
-        <button type="button" id="toggleMode">Visualizar</button>
+      <nav class="toolbar no-print" aria-label="Ações da ficha">
         <button type="button" id="exportJson">Exportar JSON</button>
         <label class="file-button">
           Importar JSON
@@ -52,7 +52,12 @@
 
           <div class="level-card ornamental">
             <span>Nível</span>
-            <input name="level" type="number" min="0" step="1">
+            <input name="level" type="number" min="1" max="20" step="1">
+          </div>
+
+          <div class="xp-card ornamental">
+            <span>XP</span>
+            <input name="xp" type="number" min="0" max="190000" step="1">
           </div>
         </section>
 
@@ -67,13 +72,13 @@
               <h2 id="vitals-title" class="sr-only">Pontos de Vida e Mana</h2>
               <article class="vital-card ornamental">
                 <strong>PV</strong>
-                <label>Atuais <input name="hpCurrent" type="number" step="1"></label>
-                <label>Máximos <input name="hpMax" type="number" step="1"></label>
+                <label>Atuais <input name="hpCurrent" type="number" min="0" max="9999" step="1"></label>
+                <label>Máximos <input name="hpMax" type="number" min="0" max="9999" step="1"></label>
               </article>
               <article class="vital-card ornamental">
                 <strong>PM</strong>
-                <label>Atuais <input name="mpCurrent" type="number" step="1"></label>
-                <label>Máximos <input name="mpMax" type="number" step="1"></label>
+                <label>Atuais <input name="mpCurrent" type="number" min="0" max="9999" step="1"></label>
+                <label>Máximos <input name="mpMax" type="number" min="0" max="9999" step="1"></label>
               </article>
             </section>
 
@@ -100,18 +105,18 @@
                 <div class="defense-total">
                   <output id="defenseTotal">10</output>
                   <span>=</span>
-                  <label>Base <input name="defenseBase" type="number" step="1"></label>
+                  <label>Base <input name="defenseBase" type="number" min="0" max="99" step="1"></label>
                   <span>+</span>
                   <label>
                     Atributo
                     <select name="defenseAttribute"></select>
                   </label>
                   <span>+</span>
-                  <label>Armadura <input name="armorBonus" type="number" step="1"></label>
+                  <label>Armadura <input name="armorBonus" type="number" min="-99" max="99" step="1"></label>
                   <span>+</span>
-                  <label>Escudo <input name="shieldBonus" type="number" step="1"></label>
+                  <label>Escudo <input name="shieldBonus" type="number" min="-99" max="99" step="1"></label>
                   <span>+</span>
-                  <label>Outros <input name="defenseOther" type="number" step="1"></label>
+                  <label>Outros <input name="defenseOther" type="number" min="-99" max="99" step="1"></label>
                 </div>
                 <label class="checkbox-line">
                   <input name="useAttributeInDefense" type="checkbox">
@@ -119,11 +124,11 @@
                 </label>
                 <div class="armor-lines">
                   <label>Armadura/Escudo <input name="armorName1" type="text"></label>
-                  <label>Defesa <input name="armorDefense1" type="number" step="1"></label>
-                  <label>Penalidade <input name="armorPenalty1" type="number" step="1"></label>
+                  <label>Defesa <input name="armorDefense1" type="number" min="0" max="99" step="1"></label>
+                  <label>Penalidade <input name="armorPenalty1" type="number" min="-99" max="0" step="1"></label>
                   <label>Armadura/Escudo <input name="armorName2" type="text"></label>
-                  <label>Defesa <input name="armorDefense2" type="number" step="1"></label>
-                  <label>Penalidade <input name="armorPenalty2" type="number" step="1"></label>
+                  <label>Defesa <input name="armorDefense2" type="number" min="0" max="99" step="1"></label>
+                  <label>Penalidade <input name="armorPenalty2" type="number" min="-99" max="0" step="1"></label>
                 </div>
               </section>
 
@@ -160,7 +165,7 @@
               </div>
               <div id="equipmentList" class="dynamic-list"></div>
               <div class="money-load">
-                <label>PP <input name="money" type="number" min="0" step="1"></label>
+                <label>PP <input name="money" type="number" min="0" max="999999" step="1"></label>
                 <label>Carga usada <output id="loadUsed">0</output></label>
               </div>
             </section>

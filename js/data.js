@@ -52,6 +52,9 @@
         origin: "",
         className: "",
         level: 1,
+        // [Tormenta20] Ghanor avança ao fim de aventuras, sem tabela de XP.
+        // O campo existe para mesas que usam o fallback de XP de T20: 0 a 190.000.
+        xp: 0,
         attributes: { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 },
         hp: { current: 0, max: 0 },
         mp: { current: 0, max: 0 },
@@ -72,8 +75,7 @@
         proficiencies: [],
         abilities: [],
         equipment: [],
-        money: 0,
-        mode: "edit"
+        money: 0
       };
     }
   };

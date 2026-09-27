@@ -35,7 +35,17 @@
   }
 
   function numberValue(name) {
-    return calc.number(input(name)?.value);
+    return clampFieldNumber(input(name));
+  }
+
+  function clampFieldNumber(field) {
+    if (!field) return 0;
+    const min = field.min === "" ? -Infinity : Number(field.min);
+    const max = field.max === "" ? Infinity : Number(field.max);
+    const value = calc.number(field.value);
+    const clamped = Math.min(Math.max(value, min), max);
+    if (String(value) !== String(clamped)) field.value = clamped;
+    return clamped;
   }
 
   function readStaticFields() {
@@ -45,6 +55,7 @@
     state.origin = input("origin").value;
     state.className = input("className").value;
     state.level = numberValue("level");
+    state.xp = numberValue("xp");
     state.hp.current = numberValue("hpCurrent");
     state.hp.max = numberValue("hpMax");
     state.mp.current = numberValue("mpCurrent");
@@ -79,7 +90,7 @@
     holder.innerHTML = attributes.map((attr) => `
       <label class="attribute-card ornamental" title="${attr.name}">
         <span>${attr.label}</span>
-        <input name="attr-${attr.key}" type="number" step="1" aria-label="${attr.name}">
+        <input name="attr-${attr.key}" type="number" min="-5" max="30" step="1" aria-label="${attr.name}">
       </label>
     `).join("");
 
@@ -101,9 +112,9 @@
           <span class="math">+</span>
           <span class="muted attr-ref">${skill.attr.toUpperCase()}</span>
           <span class="math">+</span>
-          <input data-skill-training="${skill.key}" type="number" step="1" aria-label="Treino em ${skill.name}">
+          <input data-skill-training="${skill.key}" type="number" min="-99" max="99" step="1" aria-label="Treino em ${skill.name}">
           <span class="math">+</span>
-          <input data-skill-other="${skill.key}" type="number" step="1" aria-label="Outros em ${skill.name}">
+          <input data-skill-other="${skill.key}" type="number" min="-99" max="99" step="1" aria-label="Outros em ${skill.name}">
         </div>
       `;
     }).join("");
@@ -125,7 +136,7 @@
         ${field(`attacks.${index}.critical`, "Crítico", item.critical)}
         ${field(`attacks.${index}.range`, "Alcance", item.range)}
         ${field(`attacks.${index}.type`, "Tipo", item.type)}
-        ${field(`attacks.${index}.spaces`, "Esp.", item.spaces, "number")}
+        ${field(`attacks.${index}.spaces`, "Esp.", item.spaces, "number", { min: 0, max: 999 })}
         ${removeButton("attacks", index)}
       </article>
     `);
@@ -161,8 +172,8 @@
     renderList("#equipmentList", state.equipment, "equipment", (item, index) => `
       <article class="dynamic-row equipment-row">
         ${field(`equipment.${index}.name`, "Item", item.name)}
-        ${field(`equipment.${index}.quantity`, "Qtd.", item.quantity, "number")}
-        ${field(`equipment.${index}.spaces`, "Esp.", item.spaces, "number")}
+        ${field(`equipment.${index}.quantity`, "Qtd.", item.quantity, "number", { min: 0, max: 999 })}
+        ${field(`equipment.${index}.spaces`, "Esp.", item.spaces, "number", { min: 0, max: 999 })}
         ${field(`equipment.${index}.value`, "Valor", item.value)}
         ${removeButton("equipment", index)}
       </article>
@@ -178,8 +189,11 @@
     holder.innerHTML = items.map(template).join("");
   }
 
-  function field(path, label, value, type = "text") {
-    return `<label>${label}<input data-path="${path}" type="${type}" step="1" value="${escapeAttr(value ?? "")}"></label>`;
+  function field(path, label, value, type = "text", limits = {}) {
+    const numberAttrs = type === "number"
+      ? ` min="${limits.min ?? -999}" max="${limits.max ?? 9999}" step="1"`
+      : "";
+    return `<label>${label}<input data-path="${path}" type="${type}"${numberAttrs} value="${escapeAttr(value ?? "")}"></label>`;
   }
 
   function removeButton(type, index) {
@@ -221,6 +235,7 @@
     setValue("origin", state.origin);
     setValue("className", state.className);
     setValue("level", state.level);
+    setValue("xp", state.xp);
     setValue("hpCurrent", state.hp.current);
     setValue("hpMax", state.hp.max);
     setValue("mpCurrent", state.mp.current);
@@ -248,7 +263,6 @@
       if (other) other.value = entry.other ?? 0;
       if (custom) custom.value = entry.customName ?? "";
     });
-    applyMode();
     renderTotals();
   }
 
@@ -262,16 +276,6 @@
     skills.forEach((skill) => {
       const total = document.querySelector(`[data-skill-total="${skill.key}"]`);
       if (total) total.value = calc.signed(calc.skillTotal(state, skill));
-    });
-  }
-
-  function applyMode() {
-    const readOnly = state.mode === "view";
-    document.body.classList.toggle("view-mode", readOnly);
-    document.querySelector("#toggleMode").textContent = readOnly ? "Editar" : "Visualizar";
-    form.querySelectorAll("input, textarea, select").forEach((field) => {
-      if (field.id === "importJson") return;
-      field.disabled = readOnly;
     });
   }
 
@@ -307,7 +311,7 @@
     form.addEventListener("input", (event) => {
       const target = event.target;
       if (target.matches("[data-path]")) {
-        const value = target.type === "number" ? calc.number(target.value) : target.value;
+        const value = target.type === "number" ? clampFieldNumber(target) : target.value;
         setByPath(target.dataset.path, value);
         storage.save(state);
         renderTotals();
@@ -316,8 +320,8 @@
       if (target.matches("[data-skill-training], [data-skill-other], [data-skill-custom]")) {
         const key = target.dataset.skillTraining || target.dataset.skillOther || target.dataset.skillCustom;
         state.skills[key] = state.skills[key] || {};
-        if (target.dataset.skillTraining) state.skills[key].training = calc.number(target.value);
-        if (target.dataset.skillOther) state.skills[key].other = calc.number(target.value);
+        if (target.dataset.skillTraining) state.skills[key].training = clampFieldNumber(target);
+        if (target.dataset.skillOther) state.skills[key].other = clampFieldNumber(target);
         if (target.dataset.skillCustom) state.skills[key].customName = target.value;
         storage.save(state);
         renderTotals();
@@ -342,7 +346,6 @@
         state[add.dataset.add].push(getEmptyItem(add.dataset.add));
         storage.save(state);
         renderDynamicLists();
-        applyMode();
       }
       if (remove) {
         state[remove.dataset.remove].splice(Number(remove.dataset.index), 1);
@@ -352,11 +355,6 @@
       }
     });
 
-    document.querySelector("#toggleMode").addEventListener("click", () => {
-      state.mode = state.mode === "edit" ? "view" : "edit";
-      storage.save(state);
-      applyMode();
-    });
     document.querySelector("#exportJson").addEventListener("click", exportJson);
     document.querySelector("#importJson").addEventListener("change", (event) => importJson(event.target.files[0]));
     document.querySelector("#printSheet").addEventListener("click", () => window.print());

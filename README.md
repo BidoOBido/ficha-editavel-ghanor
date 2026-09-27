@@ -12,12 +12,14 @@ Abra `index.html` em um navegador ou publique a pasta `Ficha Web/` como site est
 - Modo edição/visualização.
 - Ataques, equipamentos, proficiências e habilidades/magias expansíveis.
 - Cálculo automático de 1/2 nível, perícias, Defesa e carga usada.
+- Campo de XP opcional, limitado pela tabela de progressão de Tormenta20.
 - CSS responsivo e folha de impressão.
 
 ## Fontes de regras
 
 - **[Ghanor]** A ficha foi estruturada a partir da ficha editável de **A Lenda de Ghanor RPG**, incluindo perícias, atributos, Defesa e a fórmula geral `1/2 nível + atributo + treino + outros`.
-- **[Tormenta20]** Nenhuma regra exclusiva de Tormenta20 foi incorporada neste MVP. Campos genéricos como `Outros` existem para comportar ajustes da mesa ou fallback identificado no futuro.
+- **[Ghanor]** O nível de personagem vai de 1 a 20. O livro de Ghanor indica avanço ao fim de aventuras completadas, sem tabela própria de XP.
+- **[Tormenta20]** O campo de XP é um fallback opcional para mesas que desejem controlar experiência numericamente. Ele usa o intervalo da tabela de Tormenta20, de 0 a 190.000 XP.
 
 ## Observações do MVP
 

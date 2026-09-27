@@ -61,6 +61,12 @@ textarea {
   text-transform: uppercase;
 }
 
+.permission-text {
+  margin-top: 4px;
+  color: #d7c9aa;
+  font-size: 11px;
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -115,24 +121,10 @@ button:hover,
 
 .top-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 92px minmax(260px, 360px);
+  grid-template-columns: minmax(0, 1fr) 92px minmax(150px, 180px);
   gap: 14px;
   align-items: end;
   margin-bottom: 18px;
-}
-
-.top-grid::after {
-  content: "A LENDA DE GHANOR";
-  display: grid;
-  min-height: 78px;
-  place-items: center;
-  border: 3px solid #43321a;
-  color: #efe3c6;
-  background: linear-gradient(135deg, #22160e, #63351b 55%, #1b1510);
-  font-size: 27px;
-  font-weight: 800;
-  text-align: center;
-  text-shadow: 0 2px 0 #000;
 }
 
 .name-panel {
@@ -146,7 +138,8 @@ button:hover,
   grid-column: 1 / -1;
 }
 
-.level-card {
+.level-card,
+.xp-card {
   display: grid;
   min-height: 82px;
   place-items: center;
@@ -156,11 +149,17 @@ button:hover,
   font-weight: 700;
 }
 
-.level-card input {
+.level-card input,
+.xp-card input {
   max-width: 64px;
   border: 0;
   font-size: 34px;
   text-align: center;
+}
+
+.xp-card input {
+  max-width: 132px;
+  font-size: 26px;
 }
 
 .sheet-grid {
@@ -492,19 +491,6 @@ textarea:focus {
   white-space: nowrap;
 }
 
-.view-mode input,
-.view-mode select,
-.view-mode textarea {
-  color: var(--ink);
-  opacity: 1;
-}
-
-.view-mode .no-print,
-.view-mode [data-add],
-.view-mode [data-remove] {
-  display: none;
-}
-
 @media (max-width: 1500px) {
   .sheet-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -534,10 +520,6 @@ textarea:focus {
   .top-grid,
   .lower-grid {
     grid-template-columns: 1fr;
-  }
-
-  .top-grid::after {
-    order: -1;
   }
 
   .attributes-list {
@@ -631,10 +613,23 @@ textarea:focus {
 
   .no-print,
   .toolbar,
-  .app-bar,
   button,
   .file-button {
     display: none !important;
+  }
+
+  .app-bar {
+    position: static;
+    display: block;
+    padding: 0 8mm 4mm;
+    color: #000;
+    background: #fff;
+    box-shadow: none;
+  }
+
+  .eyebrow,
+  .permission-text {
+    color: #000;
   }
 
   .sheet-shell {
