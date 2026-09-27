@@ -33,7 +33,7 @@ test("JSON novo usa a versao atual", () => {
   const data = loadData();
   const character = data.blankCharacter();
 
-  assert.equal(data.CURRENT_SHEET_VERSION, 3);
+  assert.equal(data.CURRENT_SHEET_VERSION, 4);
   assert.equal(character.sheetVersion, data.CURRENT_SHEET_VERSION);
   assert.equal(character.level, 2);
 });
@@ -130,4 +130,14 @@ test("CD de magia usa nivel, atributo e bonus", () => {
   };
 
   assert.equal(calc.spellcastingCD(character), 25);
+});
+
+test("magias de quinto circulo sao preservadas", () => {
+  const data = loadData();
+  const imported = data.mergeCharacter(data.blankCharacter(), {
+    sheetVersion: 3,
+    spells: [{ name: "Milagre", circle: 5 }]
+  });
+
+  assert.equal(imported.spells[0].circle, 5);
 });

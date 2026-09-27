@@ -2,7 +2,7 @@
   "use strict";
 
   const LEGACY_SHEET_VERSION = 0;
-  const CURRENT_SHEET_VERSION = 3;
+  const CURRENT_SHEET_VERSION = 4;
 
   function readSheetVersion(character) {
     if (!character || typeof character !== "object") return LEGACY_SHEET_VERSION;
@@ -86,7 +86,7 @@
   function normalizeSpells(spells) {
     return spells.map((spell) => ({
       name: spell.name || "",
-      circle: Math.min(Math.max(calcNumber(spell.circle) || 1, 1), 4),
+      circle: Math.min(Math.max(calcNumber(spell.circle) || 1, 1), 5),
       school: spell.school || "",
       execution: spell.execution || "",
       cost: spell.cost || "",
