@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ficha de Personagem - A Lenda de Ghanor</title>
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <header class="app-bar no-print">
+      <div>
+        <p class="eyebrow">A Lenda de Ghanor RPG</p>
+        <h1>Ficha de Personagem</h1>
+      </div>
+      <nav class="toolbar" aria-label="Ações da ficha">
+        <button type="button" id="toggleMode">Visualizar</button>
+        <button type="button" id="exportJson">Exportar JSON</button>
+        <label class="file-button">
+          Importar JSON
+          <input type="file" id="importJson" accept="application/json">
+        </label>
+        <button type="button" id="printSheet">Imprimir</button>
+        <button type="button" id="clearSheet" class="danger">Limpar</button>
+      </nav>
+    </header>
+
+    <main class="sheet-shell">
+      <form id="characterSheet" class="sheet" autocomplete="off">
+        <section class="top-grid">
+          <div class="name-panel ornamental">
+            <label>
+              Jogador(a)
+              <input name="playerName" type="text">
+            </label>
+            <label class="wide">
+              Personagem
+              <input name="characterName" type="text">
+            </label>
+            <label>
+              Raça
+              <input name="race" type="text">
+            </label>
+            <label>
+              Origem
+              <input name="origin" type="text">
+            </label>
+            <label>
+              Classe
+              <input name="className" type="text">
+            </label>
+          </div>
+
+          <div class="level-card ornamental">
+            <span>Nível</span>
+            <input name="level" type="number" min="0" step="1">
+          </div>
+        </section>
+
+        <section class="sheet-grid">
+          <div class="left-stack">
+            <section class="attributes" aria-labelledby="attributes-title">
+              <h2 id="attributes-title" class="sr-only">Atributos</h2>
+              <div id="attributesList" class="attributes-list"></div>
+            </section>
+
+            <section class="vitals" aria-labelledby="vitals-title">
+              <h2 id="vitals-title" class="sr-only">Pontos de Vida e Mana</h2>
+              <article class="vital-card ornamental">
+                <strong>PV</strong>
+                <label>Atuais <input name="hpCurrent" type="number" step="1"></label>
+                <label>Máximos <input name="hpMax" type="number" step="1"></label>
+              </article>
+              <article class="vital-card ornamental">
+                <strong>PM</strong>
+                <label>Atuais <input name="mpCurrent" type="number" step="1"></label>
+                <label>Máximos <input name="mpMax" type="number" step="1"></label>
+              </article>
+            </section>
+
+            <section class="panel attacks-panel" aria-labelledby="attacks-title">
+              <div class="panel-heading">
+                <h2 id="attacks-title">Ataques</h2>
+                <button type="button" data-add="attacks">+ Ataque</button>
+              </div>
+              <div class="attack-header">
+                <span>Nome</span>
+                <span>Teste</span>
+                <span>Dano</span>
+                <span>Crítico</span>
+                <span>Alcance</span>
+                <span>Tipo</span>
+                <span>Esp.</span>
+              </div>
+              <div id="attacksList" class="dynamic-list"></div>
+            </section>
+
+            <section class="lower-grid">
+              <section class="defense-block panel" aria-labelledby="defense-title">
+                <h2 id="defense-title">Defesa</h2>
+                <div class="defense-total">
+                  <output id="defenseTotal">10</output>
+                  <span>=</span>
+                  <label>Base <input name="defenseBase" type="number" step="1"></label>
+                  <span>+</span>
+                  <label>
+                    Atributo
+                    <select name="defenseAttribute"></select>
+                  </label>
+                  <span>+</span>
+                  <label>Armadura <input name="armorBonus" type="number" step="1"></label>
+                  <span>+</span>
+                  <label>Escudo <input name="shieldBonus" type="number" step="1"></label>
+                  <span>+</span>
+                  <label>Outros <input name="defenseOther" type="number" step="1"></label>
+                </div>
+                <label class="checkbox-line">
+                  <input name="useAttributeInDefense" type="checkbox">
+                  Somar atributo selecionado na Defesa
+                </label>
+                <div class="armor-lines">
+                  <label>Armadura/Escudo <input name="armorName1" type="text"></label>
+                  <label>Defesa <input name="armorDefense1" type="number" step="1"></label>
+                  <label>Penalidade <input name="armorPenalty1" type="number" step="1"></label>
+                  <label>Armadura/Escudo <input name="armorName2" type="text"></label>
+                  <label>Defesa <input name="armorDefense2" type="number" step="1"></label>
+                  <label>Penalidade <input name="armorPenalty2" type="number" step="1"></label>
+                </div>
+              </section>
+
+              <section class="panel" aria-labelledby="proficiencies-title">
+                <div class="panel-heading">
+                  <h2 id="proficiencies-title">Proficiências & Outras Características</h2>
+                  <button type="button" data-add="proficiencies">+ Linha</button>
+                </div>
+                <div id="proficienciesList" class="dynamic-list simple-lines"></div>
+              </section>
+            </section>
+
+            <section class="panel abilities-panel" aria-labelledby="abilities-title">
+              <div class="panel-heading">
+                <h2 id="abilities-title">Habilidades & Magias</h2>
+                <button type="button" data-add="abilities">+ Habilidade</button>
+              </div>
+              <div id="abilitiesList" class="dynamic-list"></div>
+            </section>
+          </div>
+
+          <aside class="right-stack">
+            <section class="panel skills-panel" aria-labelledby="skills-title">
+              <h2 id="skills-title">Perícias</h2>
+              <div class="half-level">1/2 do nível: <output id="halfLevel">0</output></div>
+              <div id="skillsList" class="skills-list"></div>
+              <p class="source-note">Penalidade de armadura e perícias somente treinadas seguem a ficha de Ghanor; ajustes específicos podem ser lançados em Outros.</p>
+            </section>
+
+            <section class="panel equipment-panel" aria-labelledby="equipment-title">
+              <div class="panel-heading">
+                <h2 id="equipment-title">Equipamento</h2>
+                <button type="button" data-add="equipment">+ Item</button>
+              </div>
+              <div id="equipmentList" class="dynamic-list"></div>
+              <div class="money-load">
+                <label>PP <input name="money" type="number" min="0" step="1"></label>
+                <label>Carga usada <output id="loadUsed">0</output></label>
+              </div>
+            </section>
+          </aside>
+        </section>
+      </form>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/calculations.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
