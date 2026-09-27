@@ -20,6 +20,9 @@
     merged.proficiencies = Array.isArray(saved.proficiencies) ? saved.proficiencies : base.proficiencies;
     merged.abilities = Array.isArray(saved.abilities) ? saved.abilities : base.abilities;
     merged.equipment = Array.isArray(saved.equipment) ? saved.equipment : base.equipment;
+    merged.money = typeof saved.money === "number"
+      ? { ...base.money, silver: saved.money }
+      : { ...base.money, ...(saved.money || {}) };
     return merged;
   }
 
@@ -60,7 +63,9 @@
     state.hp.max = numberValue("hpMax");
     state.mp.current = numberValue("mpCurrent");
     state.mp.max = numberValue("mpMax");
-    state.money = numberValue("money");
+    state.money.bronze = numberValue("moneyBronze");
+    state.money.silver = numberValue("moneySilver");
+    state.money.gold = numberValue("moneyGold");
 
     attributes.forEach((attr) => {
       state.attributes[attr.key] = numberValue(`attr-${attr.key}`);
@@ -174,7 +179,7 @@
         ${field(`equipment.${index}.name`, "Item", item.name)}
         ${field(`equipment.${index}.quantity`, "Qtd.", item.quantity, "number", { min: 0, max: 999 })}
         ${field(`equipment.${index}.spaces`, "Esp.", item.spaces, "number", { min: 0, max: 999 })}
-        ${field(`equipment.${index}.value`, "Valor", item.value)}
+        ${field(`equipment.${index}.value`, "Valor (PP)", item.value)}
         ${removeButton("equipment", index)}
       </article>
     `);
@@ -240,7 +245,9 @@
     setValue("hpMax", state.hp.max);
     setValue("mpCurrent", state.mp.current);
     setValue("mpMax", state.mp.max);
-    setValue("money", state.money);
+    setValue("moneyBronze", state.money.bronze);
+    setValue("moneySilver", state.money.silver);
+    setValue("moneyGold", state.money.gold);
     attributes.forEach((attr) => setValue(`attr-${attr.key}`, state.attributes[attr.key]));
     setValue("defenseBase", state.defense.base);
     setValue("defenseAttribute", state.defense.attribute);
@@ -270,6 +277,7 @@
     document.querySelector("#halfLevel").value = calc.halfLevel(state.level);
     document.querySelector("#defenseTotal").value = calc.defenseTotal(state);
     document.querySelector("#loadUsed").value = calc.loadUsed(state);
+    document.querySelector("#moneyTotal").value = calc.formatPP(calc.moneyTotalPP(state));
     document.querySelectorAll("[data-half-skill]").forEach((item) => {
       item.textContent = calc.halfLevel(state.level);
     });

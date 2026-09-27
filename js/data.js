@@ -75,7 +75,9 @@
         proficiencies: [],
         abilities: [],
         equipment: [],
-        money: 0
+        // [Ghanor] Preços usam PP como referência. O livro usa PC para cobre;
+        // a interface usa PB a pedido da mesa, convertido como 10 PB = 1 PP.
+        money: { bronze: 0, silver: 0, gold: 0 }
       };
     }
   };

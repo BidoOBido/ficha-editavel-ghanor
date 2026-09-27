@@ -40,6 +40,16 @@
     }, 0);
   }
 
+  function moneyTotalPP(character) {
+    const money = character.money || {};
+    return number(money.bronze) / 10 + number(money.silver) + number(money.gold) * 10;
+  }
+
+  function formatPP(value) {
+    const numeric = number(value);
+    return Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(1).replace(".", ",");
+  }
+
   window.GhanorSheetCalculations = {
     number,
     signed,
@@ -47,6 +57,8 @@
     skillTotal,
     defenseTotal,
     loadUsed,
+    moneyTotalPP,
+    formatPP,
     totalArmorPenalty
   };
 })();

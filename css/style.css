@@ -471,9 +471,16 @@ textarea:focus {
 
 .money-load {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(74px, 1fr)) minmax(112px, 1.2fr) minmax(112px, 1.2fr);
   gap: 12px;
   margin-top: 14px;
+}
+
+.money-total output {
+  min-height: 30px;
+  border-bottom: 2px solid var(--line);
+  padding: 4px 5px;
+  color: var(--ink);
 }
 
 .empty {
