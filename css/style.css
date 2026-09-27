@@ -283,20 +283,25 @@ textarea:focus {
 .equipment-header,
 .attack-row {
   display: grid;
-  grid-template-columns: 34px minmax(160px, 2fr) minmax(72px, 0.8fr) minmax(92px, 1fr) minmax(82px, 0.9fr) minmax(90px, 1fr) minmax(82px, 1fr) minmax(56px, 0.6fr) auto;
+  grid-template-columns: 70px minmax(160px, 2fr) minmax(72px, 0.8fr) minmax(92px, 1fr) minmax(82px, 0.9fr) minmax(90px, 1fr) minmax(82px, 1fr) minmax(56px, 0.6fr) auto;
   gap: 9px;
   align-items: end;
 }
 
-.attack-header,
-.equipment-header {
-  padding: 0 34px 6px 43px;
+.attack-header {
+  padding: 0 34px 6px 79px;
   color: var(--muted);
   font-size: 12px;
 }
 
 .attack-header {
   grid-template-columns: minmax(160px, 2fr) minmax(72px, 0.8fr) minmax(92px, 1fr) minmax(82px, 0.9fr) minmax(90px, 1fr) minmax(82px, 1fr) minmax(56px, 0.6fr);
+}
+
+.equipment-header {
+  padding: 0 34px 6px 79px;
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .dynamic-list {
@@ -311,15 +316,15 @@ textarea:focus {
 }
 
 .simple-row {
-  grid-template-columns: 34px 1fr auto;
+  grid-template-columns: 70px 1fr auto;
 }
 
 .equipment-row {
-  grid-template-columns: 34px minmax(150px, 2fr) minmax(62px, 0.7fr) minmax(62px, 0.7fr) minmax(84px, 1fr) auto;
+  grid-template-columns: 70px minmax(118px, 2fr) minmax(46px, 0.7fr) minmax(46px, 0.7fr) minmax(66px, 1fr) auto;
 }
 
 .equipment-header {
-  grid-template-columns: minmax(150px, 2fr) minmax(62px, 0.7fr) minmax(62px, 0.7fr) minmax(84px, 1fr);
+  grid-template-columns: minmax(118px, 2fr) minmax(46px, 0.7fr) minmax(46px, 0.7fr) minmax(66px, 1fr);
 }
 
 .grid-field .field-label {
@@ -343,9 +348,15 @@ textarea:focus {
 }
 
 .row-actions {
-  display: grid;
+  display: flex;
+  flex-wrap: nowrap;
   gap: 4px;
   align-self: start;
+}
+
+.row-actions .icon-button {
+  flex: 0 0 30px;
+  width: 30px;
 }
 
 .drag-handle {
@@ -495,7 +506,7 @@ textarea:focus {
 .ability-row,
 .note-item {
   display: grid;
-  grid-template-columns: 34px 1fr;
+  grid-template-columns: 106px 1fr;
   gap: 8px;
   border-bottom: 1px solid #b7aa8d;
   padding: 5px 0;
@@ -644,12 +655,19 @@ textarea:focus {
     width: 100%;
   }
 
+  .row-actions .icon-button {
+    width: 30px;
+  }
+
   .attack-row,
   .equipment-row,
-  .simple-row,
+  .simple-row {
+    grid-template-columns: 70px 1fr;
+  }
+
   .ability-row,
   .note-item {
-    grid-template-columns: 42px 1fr;
+    grid-template-columns: 106px 1fr;
   }
 }
 
@@ -700,6 +718,10 @@ textarea:focus {
   .ability-row,
   .note-item {
     grid-template-columns: 1fr;
+  }
+
+  .row-actions {
+    justify-self: start;
   }
 
   .ability-body,
