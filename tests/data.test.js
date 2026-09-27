@@ -132,6 +132,47 @@ test("CD de magia usa nivel, atributo e bonus", () => {
   assert.equal(calc.spellcastingCD(character), 25);
 });
 
+test("calculos rejeitam numeros com conteudo nao numerico", () => {
+  const calc = loadCalculations();
+
+  assert.equal(calc.number("10"), 10);
+  assert.equal(calc.number("-3"), -3);
+  assert.equal(calc.number("10<script>"), 0);
+  assert.equal(calc.number("0x10"), 0);
+  assert.equal(calc.number("1e3"), 0);
+});
+
+test("calculos rejeitam chaves textuais de atributo nao permitidas", () => {
+  const calc = loadCalculations();
+  const character = {
+    level: "10<script>",
+    attributes: {
+      for: 3,
+      int: 4,
+      "__proto__": 99
+    },
+    defense: {
+      useAttribute: true,
+      attribute: "__proto__",
+      base: "10",
+      other: "1<script>",
+      armor: { defense: "2<script>", penalty: 0 },
+      shield: { defense: "1", penalty: 0 }
+    },
+    spellcasting: {
+      attribute: "for",
+      equipmentBonus: "1<script>",
+      powerBonus: "2",
+      otherBonus: "3"
+    },
+    skills: { melee: { trained: true, other: "1<script>" } }
+  };
+
+  assert.equal(calc.defenseTotal(character), 11);
+  assert.equal(calc.spellcastingCD(character), 15);
+  assert.equal(calc.skillTotal(character, { key: "melee", attr: "__proto__" }), 2);
+});
+
 test("magias de quinto circulo sao preservadas", () => {
   const data = loadData();
   const imported = data.mergeCharacter(data.blankCharacter(), {

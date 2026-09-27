@@ -1,9 +1,30 @@
 (function () {
   "use strict";
 
+  const ATTRIBUTE_KEYS = new Set(["for", "des", "con", "int", "sab", "car"]);
+  const SPELL_ATTRIBUTE_KEYS = new Set(["int", "sab", "car"]);
+  const NUMERIC_PATTERN = /^-?\d+(?:\.\d+)?$/;
+
   function number(value) {
-    const parsed = Number(value);
+    const parsed = parseStrictNumber(value);
     return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function parseStrictNumber(value) {
+    if (typeof value === "number") return value;
+    if (typeof value !== "string") return 0;
+    const trimmed = value.trim();
+    if (!NUMERIC_PATTERN.test(trimmed)) return 0;
+    return Number(trimmed);
+  }
+
+  function safeAttributeKey(value, allowedKeys = ATTRIBUTE_KEYS) {
+    return allowedKeys.has(value) ? value : "";
+  }
+
+  function attributeValue(character, key, allowedKeys = ATTRIBUTE_KEYS) {
+    const safeKey = safeAttributeKey(key, allowedKeys);
+    return safeKey ? number(character.attributes?.[safeKey]) : 0;
   }
 
   function signed(value) {
@@ -37,7 +58,7 @@
   function skillTotal(character, skill) {
     const entry = character.skills[skill.key] || {};
     const base = halfLevel(character.level);
-    const attr = number(character.attributes[skill.attr]);
+    const attr = attributeValue(character, skill.attr);
     const training = entry.trained ? trainingBonus(character.level) : 0;
     const other = number(entry.other);
     const armor = skill.armorPenalty ? totalArmorPenalty(character) : 0;
@@ -45,15 +66,15 @@
   }
 
   function defenseTotal(character) {
-    const attr = character.defense.useAttribute ? number(character.attributes[character.defense.attribute]) : 0;
+    const attr = character.defense.useAttribute ? attributeValue(character, character.defense.attribute) : 0;
     return number(character.defense.base) + attr + armorDefense(character) + shieldDefense(character) + number(character.defense.other);
   }
 
   function resistanceCD(character, effect) {
-    const attr = effect?.attribute || "";
+    const attr = safeAttributeKey(effect?.attribute || "", SPELL_ATTRIBUTE_KEYS);
     return 10
       + halfLevel(character.level)
-      + (attr ? number(character.attributes?.[attr]) : 0)
+      + attributeValue(character, attr, SPELL_ATTRIBUTE_KEYS)
       + number(effect?.equipmentBonus)
       + number(effect?.powerBonus)
       + number(effect?.otherBonus);
@@ -99,6 +120,7 @@
     loadLimit,
     moneyTotalPP,
     formatPP,
-    totalArmorPenalty
+    totalArmorPenalty,
+    safeAttributeKey
   };
 })();
