@@ -155,9 +155,19 @@ button:hover,
 }
 
 .about-section h2 {
+  display: flex;
+  gap: 8px;
+  align-items: center;
   margin: 0 0 10px;
   color: #5a4016;
   font-size: 22px;
+}
+
+.material-icon {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
 }
 
 .about-section p,
@@ -183,6 +193,25 @@ button:hover,
 .about-section a {
   color: #5a4016;
   font-weight: 700;
+}
+
+.credit-list {
+  display: grid;
+  gap: 10px;
+  padding-left: 0;
+  list-style: none;
+}
+
+.credit-list li {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.credit-list .material-icon {
+  margin-top: 2px;
+  color: #5a4016;
 }
 
 .sheet {
