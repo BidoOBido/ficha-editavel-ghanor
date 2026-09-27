@@ -2,6 +2,15 @@
   "use strict";
 
   function create({ attributes, calc, labelHints }) {
+    const icons = {
+      expandMore: '<svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>',
+      chevronRight: '<svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6-6-6z"/></svg>',
+      openWith: '<svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2-5-5v3h-3v4h3v3l5-5zm-13 3H6v3H3l5 5 5-5h-3v-3z"/></svg>',
+      contentCopy: '<svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 18H8V7h11v16z"/></svg>',
+      delete: '<svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5-1-1h-5l-1 1H5v2h14V4h-3.5z"/></svg>',
+      add: '<svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>'
+    };
+
     function field(path, label, value, type = "text", options = {}) {
       const numberAttrs = type === "number"
         ? ` min="${options.min ?? -999}" max="${options.max ?? 9999}" step="${options.step ?? 1}"`
@@ -22,19 +31,19 @@
 
     function rowActions(type, index, collapsible = false, open = true) {
       const toggle = collapsible
-        ? `<button type="button" class="icon-button no-print" data-toggle-row="${type}" data-index="${index}" aria-label="${open ? "Colapsar" : "Abrir"}">${open ? "⌄" : "›"}</button>`
+        ? `<button type="button" class="icon-button no-print" data-toggle-row="${type}" data-index="${index}" aria-label="${open ? "Colapsar" : "Abrir"}">${open ? icons.expandMore : icons.chevronRight}</button>`
         : "";
       return `
         <div class="row-actions no-print">
           ${toggle}
-          <button type="button" class="icon-button drag-handle" draggable="true" data-drag="${type}" data-index="${index}" aria-label="Reordenar">↕</button>
-          <button type="button" class="icon-button" data-copy="${type}" data-index="${index}" aria-label="Copiar">⧉</button>
+          <button type="button" class="icon-button drag-handle" draggable="true" data-drag="${type}" data-index="${index}" aria-label="Reordenar">${icons.openWith}</button>
+          <button type="button" class="icon-button" data-copy="${type}" data-index="${index}" aria-label="Copiar">${icons.contentCopy}</button>
         </div>
       `;
     }
 
     function removeButton(type, index) {
-      return `<button type="button" class="icon-button no-print" data-remove="${type}" data-index="${index}" aria-label="Remover">×</button>`;
+      return `<button type="button" class="icon-button no-print" data-remove="${type}" data-index="${index}" aria-label="Remover">${icons.delete}</button>`;
     }
 
     function attributeName(key) {
@@ -131,7 +140,7 @@
               <div class="spell-circle-heading">
                 <h3>${circle}º Círculo</h3>
                 <span>${spellCircleCost(circle)}</span>
-                <button type="button" class="icon-button no-print" data-add-spell-circle="${circle}" aria-label="Adicionar magia de ${circle}º círculo">+</button>
+                <button type="button" class="icon-button no-print" data-add-spell-circle="${circle}" aria-label="Adicionar magia de ${circle}º círculo">${icons.add}</button>
               </div>
               <div class="spell-circle-list">
                 ${circleSpells.length ? circleSpells.map(({ item, index }) => this.spell(item, index)).join("") : "<p class=\"empty\">Nenhuma magia.</p>"}

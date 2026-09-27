@@ -16,16 +16,16 @@
         <p class="permission-text">É permitido reproduzir esta página para uso pessoal. Em troca, visite jamboeditora.com.br.</p>
       </div>
       <nav class="toolbar no-print" aria-label="Ações da ficha">
-        <button type="button" id="exportJson">Exportar JSON</button>
+        <button type="button" id="exportJson"><svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg><span>Exportar JSON</span></button>
         <label class="file-button">
-          Importar JSON
+          <svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 13h-4V7H9v6H5l7-7 7 7z"/></svg><span>Importar JSON</span>
           <input type="file" id="importJson" accept="application/json">
         </label>
-        <button type="button" id="clearSheet" class="danger">Limpar</button>
+        <button type="button" id="clearSheet" class="danger"><svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5-1-1h-5l-1 1H5v2h14V4h-3.5z"/></svg><span>Limpar</span></button>
       </nav>
     </header>
 
-    <a class="fixed-page-link no-print" href="sobre.html">Sobre</a>
+    <a class="fixed-page-link no-print" href="sobre.html"><svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M11 17h2v-6h-2v6zm1-14C6.48 3 2 7.48 2 13s4.48 10 10 10 10-4.48 10-10S17.52 3 12 3zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-12h2V7h-2v2z"/></svg><span>Sobre</span></a>
 
     <main class="sheet-shell">
       <form id="characterSheet" class="sheet" autocomplete="off">
@@ -88,7 +88,7 @@
             <section class="panel attacks-panel" aria-labelledby="attacks-title">
               <div class="panel-heading">
                 <h2 id="attacks-title">Ataques</h2>
-                <button type="button" data-add="attacks">+ Ataque</button>
+                <button type="button" data-add="attacks"><svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Ataque</span></button>
               </div>
               <div class="attack-header">
                 <span>Nome</span>
@@ -138,7 +138,7 @@
             <section class="panel abilities-panel" aria-labelledby="abilities-title">
               <div class="panel-heading">
                 <h2 id="abilities-title">Habilidades</h2>
-                <button type="button" data-add="abilities">+ Habilidade</button>
+                <button type="button" data-add="abilities"><svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Habilidade</span></button>
               </div>
               <div id="abilitiesList" class="dynamic-list"></div>
             </section>
@@ -174,7 +174,7 @@
             <section class="panel notes-panel" aria-labelledby="notes-title">
               <div class="panel-heading">
                 <h2 id="notes-title">Anotações</h2>
-                <button type="button" data-add="notes">+ Anotação</button>
+                <button type="button" data-add="notes"><svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Anotação</span></button>
               </div>
               <div id="notesList" class="dynamic-list"></div>
             </section>
@@ -191,7 +191,7 @@
             <section class="panel equipment-panel" aria-labelledby="equipment-title">
               <div class="panel-heading">
                 <h2 id="equipment-title">Equipamento</h2>
-                <button type="button" data-add="equipment">+ Item</button>
+                <button type="button" data-add="equipment"><svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Item</span></button>
               </div>
               <div class="equipment-header">
                 <span>Item</span>
@@ -212,7 +212,7 @@
             <section class="panel" aria-labelledby="proficiencies-title">
               <div class="panel-heading">
                 <h2 id="proficiencies-title">Proficiências & Outras Características</h2>
-                <button type="button" data-add="proficiencies">+ Linha</button>
+                <button type="button" data-add="proficiencies"><svg class="material-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Linha</span></button>
               </div>
               <div id="proficienciesList" class="dynamic-list simple-lines"></div>
             </section>
@@ -228,3 +228,4 @@
     <script src="js/app.js"></script>
   </body>
 </html>
+
