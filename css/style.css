@@ -390,7 +390,6 @@ textarea:focus {
 
 .defense-total label output {
   min-height: 30px;
-  border-bottom: 2px solid var(--line);
   padding: 4px 5px;
   color: var(--ink);
 }
@@ -497,8 +496,74 @@ textarea:focus {
   min-height: 240px;
 }
 
+.spells-panel {
+  min-height: 420px;
+}
+
+.spellcasting-cd {
+  display: grid;
+  grid-template-columns: auto 48px auto auto auto minmax(72px, 0.7fr) auto minmax(72px, 0.7fr) auto minmax(72px, 0.7fr) auto minmax(72px, 0.7fr);
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+.spellcasting-cd strong {
+  align-self: center;
+}
+
+.spellcasting-cd > span {
+  align-self: center;
+  font-weight: 800;
+}
+
+.spellcasting-cd output {
+  min-height: 30px;
+  border: 1px solid var(--gold);
+  padding: 4px 2px;
+  text-align: center;
+  font-weight: 800;
+}
+
+.spells-by-circle {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.spell-circle {
+  min-width: 0;
+}
+
+.spell-circle-heading {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  border-bottom: 2px solid var(--line);
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+}
+
+.spell-circle-heading h3 {
+  margin: 0;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.spell-circle-heading span {
+  font-size: 12px;
+  font-style: italic;
+}
+
+.spell-circle-list {
+  display: grid;
+  gap: 8px;
+}
+
 .ability-row,
-.note-item {
+.note-item,
+.spell-row {
   display: grid;
   grid-template-columns: 106px 1fr;
   gap: 8px;
@@ -513,6 +578,13 @@ textarea:focus {
   align-items: end;
 }
 
+.spell-summary {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) 64px minmax(68px, 0.55fr) minmax(96px, 0.75fr) auto;
+  gap: 8px;
+  align-items: end;
+}
+
 .ability-body {
   display: grid;
   gap: 8px;
@@ -520,11 +592,29 @@ textarea:focus {
   padding: 8px 0 4px;
 }
 
+.spell-body {
+  display: grid;
+  gap: 8px;
+  grid-column: 2;
+  padding: 8px 0 4px;
+}
+
+.spell-details {
+  display: grid;
+  gap: 8px;
+  align-items: end;
+}
+
+.spell-details {
+  grid-template-columns: repeat(3, minmax(90px, 1fr));
+}
+
 .note-body {
   grid-column: 2;
 }
 
 .is-collapsed .ability-body,
+.is-collapsed .spell-body,
 .is-collapsed .note-body {
   display: none;
 }
@@ -546,7 +636,6 @@ textarea:focus {
 
 .money-total output {
   min-height: 30px;
-  border-bottom: 2px solid var(--line);
   padding: 4px 5px;
   color: var(--ink);
 }
@@ -628,6 +717,9 @@ textarea:focus {
   .equipment-row,
   .note-row,
   .ability-summary,
+  .spell-summary,
+  .spell-details,
+  .spellcasting-cd,
   .defense-total {
     grid-template-columns: 1fr 1fr;
   }
@@ -656,7 +748,8 @@ textarea:focus {
   }
 
   .ability-row,
-  .note-item {
+  .note-item,
+  .spell-row {
     grid-template-columns: 106px 1fr;
   }
 }
@@ -699,6 +792,9 @@ textarea:focus {
   .equipment-row,
   .note-row,
   .ability-summary,
+  .spell-summary,
+  .spell-details,
+  .spellcasting-cd,
   .defense-total,
   .right-stack {
     grid-template-columns: 1fr;
@@ -706,7 +802,8 @@ textarea:focus {
 
   .simple-row,
   .ability-row,
-  .note-item {
+  .note-item,
+  .spell-row {
     grid-template-columns: 1fr;
   }
 
@@ -715,6 +812,7 @@ textarea:focus {
   }
 
   .ability-body,
+  .spell-body,
   .note-body {
     grid-column: 1;
   }

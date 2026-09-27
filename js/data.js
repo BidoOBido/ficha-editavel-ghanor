@@ -2,7 +2,7 @@
   "use strict";
 
   const LEGACY_SHEET_VERSION = 0;
-  const CURRENT_SHEET_VERSION = 2;
+  const CURRENT_SHEET_VERSION = 3;
 
   function readSheetVersion(character) {
     if (!character || typeof character !== "object") return LEGACY_SHEET_VERSION;
@@ -37,6 +37,8 @@
     merged.attacks = Array.isArray(saved.attacks) ? saved.attacks : base.attacks;
     merged.proficiencies = Array.isArray(saved.proficiencies) ? saved.proficiencies : base.proficiencies;
     merged.abilities = Array.isArray(saved.abilities) ? saved.abilities : base.abilities;
+    merged.spellcasting = { ...base.spellcasting, ...(saved.spellcasting || {}) };
+    merged.spells = normalizeSpells(Array.isArray(saved.spells) ? saved.spells : migrateSpellsFromAbilities(merged.abilities, savedVersion));
     merged.equipment = Array.isArray(saved.equipment) ? saved.equipment : base.equipment;
     merged.notes = Array.isArray(saved.notes) ? saved.notes : base.notes;
     merged.money = typeof saved.money === "number"
@@ -58,6 +60,43 @@
       if (typeof migrated.trained !== "boolean") migrated.trained = calcNumber(migrated.training) > 0;
       delete migrated.training;
       return [key, migrated];
+    }));
+  }
+
+  function migrateSpellsFromAbilities(abilities, savedVersion) {
+    if (savedVersion >= 3 || !Array.isArray(abilities)) return [];
+    return abilities
+      .filter((item) => /magia/i.test(item?.kind || ""))
+      .map((item) => ({
+        name: item.name || "",
+        circle: 1,
+        school: "",
+        execution: "",
+        cost: item.cost || "",
+        range: "",
+        target: "",
+        duration: "",
+        resistance: "",
+        partial: "",
+        description: item.description || "",
+        open: item.open !== false
+      }));
+  }
+
+  function normalizeSpells(spells) {
+    return spells.map((spell) => ({
+      name: spell.name || "",
+      circle: Math.min(Math.max(calcNumber(spell.circle) || 1, 1), 4),
+      school: spell.school || "",
+      execution: spell.execution || "",
+      cost: spell.cost || "",
+      range: spell.range || "",
+      target: spell.target || "",
+      duration: spell.duration || "",
+      resistance: spell.resistance || "",
+      partial: spell.partial || "",
+      description: spell.description || "",
+      open: spell.open !== false
     }));
   }
 
@@ -134,6 +173,8 @@
         attacks: [],
         proficiencies: [],
         abilities: [],
+        spellcasting: { attribute: "int", equipmentBonus: 0, powerBonus: 0, otherBonus: 0 },
+        spells: [],
         equipment: [],
         notes: [],
         // [Ghanor] Preços usam PP como referência. O livro usa PC para cobre;

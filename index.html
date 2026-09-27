@@ -11,7 +11,7 @@
       <div>
         <p class="eyebrow">A Lenda de Ghanor RPG</p>
         <h1>Ficha de Personagem</h1>
-        <p class="permission-text">É permitido reproduzir esta página para uso pessoal. Em troca, visite-nos em jamboeditora.com.br.</p>
+        <p class="permission-text">É permitido reproduzir esta página para uso pessoal. Em troca, visite jamboeditora.com.br.</p>
       </div>
       <nav class="toolbar no-print" aria-label="Ações da ficha">
         <button type="button" id="exportJson">Exportar JSON</button>
@@ -133,10 +133,38 @@
 
             <section class="panel abilities-panel" aria-labelledby="abilities-title">
               <div class="panel-heading">
-                <h2 id="abilities-title">Habilidades & Magias</h2>
+                <h2 id="abilities-title">Habilidades</h2>
                 <button type="button" data-add="abilities">+ Habilidade</button>
               </div>
               <div id="abilitiesList" class="dynamic-list"></div>
+            </section>
+
+            <section class="panel spells-panel" aria-labelledby="spells-title">
+              <div class="panel-heading">
+                <h2 id="spells-title">Magias</h2>
+              </div>
+              <div class="spellcasting-cd">
+                <strong>CD</strong>
+                <output id="spellcastingCD">10</output>
+                <span>=</span>
+                <span>10</span>
+                <span>+</span>
+                <label>
+                  Atributo
+                  <select data-path="spellcasting.attribute">
+                    <option value="int">INT</option>
+                    <option value="sab">SAB</option>
+                    <option value="car">CAR</option>
+                  </select>
+                </label>
+                <span>+</span>
+                <label>Equip. <input data-path="spellcasting.equipmentBonus" type="number" min="-99" max="99" step="1"></label>
+                <span>+</span>
+                <label>Poder <input data-path="spellcasting.powerBonus" type="number" min="-99" max="99" step="1"></label>
+                <span>+</span>
+                <label>Outros <input data-path="spellcasting.otherBonus" type="number" min="-99" max="99" step="1"></label>
+              </div>
+              <div id="spellsList" class="spells-by-circle"></div>
             </section>
 
             <section class="panel notes-panel" aria-labelledby="notes-title">

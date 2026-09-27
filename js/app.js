@@ -29,6 +29,13 @@
     else field.value = value ?? "";
   }
 
+  function setPathValue(path, value) {
+    const field = document.querySelector(`[data-path="${path}"]`);
+    if (!field) return;
+    if (field.type === "checkbox") field.checked = Boolean(value);
+    else field.value = value ?? "";
+  }
+
   function numberValue(name) {
     return clampFieldNumber(input(name));
   }
@@ -136,6 +143,7 @@
     renderAttacks();
     renderProficiencies();
     renderAbilities();
+    renderSpells();
     renderEquipment();
     renderNotes();
   }
@@ -182,6 +190,57 @@
         </div>
       </article>
     `);
+  }
+
+  function renderSpells() {
+    const holder = document.querySelector("#spellsList");
+    holder.innerHTML = [1, 2, 3, 4].map((circle) => {
+      const spells = state.spells
+        .map((item, index) => ({ item, index }))
+        .filter(({ item }) => calc.number(item.circle) === circle);
+      return `
+        <section class="spell-circle" data-spell-circle="${circle}">
+          <div class="spell-circle-heading">
+            <h3>${circle}º Círculo</h3>
+            <span>${spellCircleCost(circle)}</span>
+            <button type="button" class="icon-button no-print" data-add-spell-circle="${circle}" aria-label="Adicionar magia de ${circle}º círculo">+</button>
+          </div>
+          <div class="spell-circle-list">
+            ${spells.length ? spells.map(({ item, index }) => spellTemplate(item, index)).join("") : "<p class=\"empty\">Nenhuma magia.</p>"}
+          </div>
+        </section>
+      `;
+    }).join("");
+  }
+
+  function spellTemplate(item, index) {
+    return `
+      <article class="spell-row ${item.open === false ? "is-collapsed" : ""}" data-row-type="spells" data-index="${index}">
+        ${rowActions("spells", index, true, item.open !== false)}
+        <div class="spell-summary">
+          ${field(`spells.${index}.name`, "Nome", item.name)}
+          <label class="spell-circle-select"><span class="field-label">Círculo</span><input data-path="spells.${index}.circle" type="number" min="1" max="4" step="1" value="${escapeAttr(item.circle ?? 1)}"></label>
+          ${field(`spells.${index}.cost`, "Custo", item.cost)}
+          ${selectField(`spells.${index}.resistance`, "Resistência", item.resistance, ["", "Fortitude", "Reflexos", "Vontade"])}
+          ${removeButton("spells", index)}
+        </div>
+        <div class="spell-body">
+          <div class="spell-details">
+            ${field(`spells.${index}.school`, "Escola", item.school)}
+            ${field(`spells.${index}.execution`, "Execução", item.execution)}
+            ${field(`spells.${index}.range`, "Alcance", item.range)}
+            ${field(`spells.${index}.target`, "Alvo/Área", item.target)}
+            ${field(`spells.${index}.duration`, "Duração", item.duration)}
+            ${field(`spells.${index}.partial`, "Se resistir", item.partial)}
+          </div>
+          <label>Descrição<textarea data-path="spells.${index}.description">${escapeHtml(item.description || "")}</textarea></label>
+        </div>
+      </article>
+    `;
+  }
+
+  function spellCircleCost(circle) {
+    return ({ 1: "1 PM", 2: "3 PM", 3: "6 PM", 4: "10 PM" })[circle];
   }
 
   function renderNotes() {
@@ -243,6 +302,14 @@
     return `<label${className}${title}><span class="field-label">${label}</span><input data-path="${path}" type="${type}"${numberAttrs}${title} value="${escapeAttr(value ?? "")}"></label>`;
   }
 
+  function selectField(path, label, value, options, isAttribute = false) {
+    const content = options.map((option) => {
+      const display = isAttribute && option ? option.toUpperCase() : option;
+      return `<option value="${escapeAttr(option)}"${option === (value ?? "") ? " selected" : ""}>${display || "-"}</option>`;
+    }).join("");
+    return `<label><span class="field-label">${label}</span><select data-path="${path}">${content}</select></label>`;
+  }
+
   function attributeName(key) {
     return attributes.find((attr) => attr.key === key)?.name || key;
   }
@@ -274,6 +341,20 @@
       attacks: { name: "", test: "", damage: "", critical: "", range: "", type: "", spaces: 0 },
       proficiencies: { text: "" },
       abilities: { name: "", kind: "Habilidade", cost: "", source: "", description: "", open: true },
+      spells: {
+        name: "",
+        circle: 1,
+        school: "",
+        execution: "",
+        resistance: "",
+        cost: "",
+        range: "",
+        target: "",
+        duration: "",
+        partial: "",
+        description: "",
+        open: true
+      },
       equipment: { name: "", quantity: 1, spaces: 0, value: "" },
       notes: { title: "", text: "" }
     };
@@ -299,6 +380,10 @@
     setValue("moneyBronze", state.money.bronze);
     setValue("moneySilver", state.money.silver);
     setValue("moneyGold", state.money.gold);
+    setPathValue("spellcasting.attribute", state.spellcasting.attribute);
+    setPathValue("spellcasting.equipmentBonus", state.spellcasting.equipmentBonus);
+    setPathValue("spellcasting.powerBonus", state.spellcasting.powerBonus);
+    setPathValue("spellcasting.otherBonus", state.spellcasting.otherBonus);
     attributes.forEach((attr) => setValue(`attr-${attr.key}`, state.attributes[attr.key]));
     setValue("defenseBase", state.defense.base);
     setValue("defenseAttribute", state.defense.attribute);
@@ -338,6 +423,7 @@
       if (training) training.textContent = state.skills[skill.key]?.trained ? calc.trainingBonus(state.level) : 0;
       if (total) total.value = calc.signed(calc.skillTotal(state, skill));
     });
+    document.querySelector("#spellcastingCD").value = calc.spellcastingCD(state);
   }
 
   function exportJson() {
@@ -377,13 +463,18 @@
   }
 
   function bindEvents() {
+    function handlePathField(target) {
+      const value = target.type === "number" ? clampFieldNumber(target) : target.value;
+      setByPath(target.dataset.path, value);
+      storage.save(state);
+      if (/^spells\.\d+\.circle$/.test(target.dataset.path)) renderDynamicLists();
+      renderTotals();
+    }
+
     form.addEventListener("input", (event) => {
       const target = event.target;
       if (target.matches("[data-path]")) {
-        const value = target.type === "number" ? clampFieldNumber(target) : target.value;
-        setByPath(target.dataset.path, value);
-        storage.save(state);
-        renderTotals();
+        handlePathField(target);
         return;
       }
       if (target.matches("[data-skill-trained], [data-skill-other], [data-skill-custom]")) {
@@ -399,11 +490,24 @@
       saveAndRender();
     });
 
+    form.addEventListener("change", (event) => {
+      const target = event.target;
+      if (target.matches("select[data-path]")) handlePathField(target);
+    });
+
     document.addEventListener("click", (event) => {
       const add = event.target.closest("[data-add]");
       const remove = event.target.closest("[data-remove]");
       const copy = event.target.closest("[data-copy]");
       const toggle = event.target.closest("[data-toggle-row]");
+      const addSpellCircle = event.target.closest("[data-add-spell-circle]");
+      if (addSpellCircle) {
+        const spell = getEmptyItem("spells");
+        spell.circle = Number(addSpellCircle.dataset.addSpellCircle);
+        state.spells.push(spell);
+        storage.save(state);
+        renderDynamicLists();
+      }
       if (add) {
         state[add.dataset.add].push(getEmptyItem(add.dataset.add));
         storage.save(state);

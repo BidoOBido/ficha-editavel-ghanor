@@ -49,6 +49,20 @@
     return number(character.defense.base) + attr + armorDefense(character) + shieldDefense(character) + number(character.defense.other);
   }
 
+  function resistanceCD(character, effect) {
+    const attr = effect?.attribute || "";
+    return 10
+      + halfLevel(character.level)
+      + (attr ? number(character.attributes?.[attr]) : 0)
+      + number(effect?.equipmentBonus)
+      + number(effect?.powerBonus)
+      + number(effect?.otherBonus);
+  }
+
+  function spellcastingCD(character) {
+    return resistanceCD(character, character.spellcasting || {});
+  }
+
   function loadUsed(character) {
     return (character.equipment || []).reduce((sum, item) => {
       return sum + number(item.quantity || 1) * number(item.spaces);
@@ -77,6 +91,8 @@
     trainingBonus,
     skillTotal,
     defenseTotal,
+    resistanceCD,
+    spellcastingCD,
     armorDefense,
     shieldDefense,
     loadUsed,

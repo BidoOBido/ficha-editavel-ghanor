@@ -33,7 +33,7 @@ test("JSON novo usa a versao atual", () => {
   const data = loadData();
   const character = data.blankCharacter();
 
-  assert.equal(data.CURRENT_SHEET_VERSION, 2);
+  assert.equal(data.CURRENT_SHEET_VERSION, 3);
   assert.equal(character.sheetVersion, data.CURRENT_SHEET_VERSION);
   assert.equal(character.level, 2);
 });
@@ -96,4 +96,38 @@ test("total de pericia usa checkbox treinado em vez de campo numerico", () => {
   };
 
   assert.equal(calc.skillTotal(character, { key: "melee", attr: "for" }), 11);
+});
+
+test("magias antigas em habilidades alimentam o novo bloco por circulo", () => {
+  const data = loadData();
+  const imported = data.mergeCharacter(data.blankCharacter(), {
+    sheetVersion: 2,
+    abilities: [
+      { name: "Raio", kind: "Magia", cost: "1 PM", description: "Reflexos reduz a metade" },
+      { name: "Peçonha", kind: "Veneno", description: "Fortitude evita" },
+      { name: "Grito", kind: "Habilidade" }
+    ]
+  });
+
+  assert.equal(imported.spells.length, 1);
+  assert.equal(imported.spells[0].name, "Raio");
+  assert.equal(imported.spells[0].circle, 1);
+  assert.equal(imported.spells[0].cost, "1 PM");
+  assert.equal(imported.abilities.length, 3);
+});
+
+test("CD de magia usa nivel, atributo e bonus", () => {
+  const calc = loadCalculations();
+  const character = {
+    level: 10,
+    attributes: { int: 4 },
+    spellcasting: {
+      attribute: "int",
+      equipmentBonus: 1,
+      powerBonus: 2,
+      otherBonus: 3
+    }
+  };
+
+  assert.equal(calc.spellcastingCD(character), 25);
 });
