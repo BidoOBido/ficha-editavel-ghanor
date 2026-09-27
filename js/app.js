@@ -31,6 +31,7 @@
     merged.proficiencies = Array.isArray(saved.proficiencies) ? saved.proficiencies : base.proficiencies;
     merged.abilities = Array.isArray(saved.abilities) ? saved.abilities : base.abilities;
     merged.equipment = Array.isArray(saved.equipment) ? saved.equipment : base.equipment;
+    merged.notes = Array.isArray(saved.notes) ? saved.notes : base.notes;
     merged.money = typeof saved.money === "number"
       ? { ...base.money, silver: saved.money }
       : { ...base.money, ...(saved.money || {}) };
@@ -70,10 +71,12 @@
     state.className = input("className").value;
     state.level = numberValue("level");
     state.xp = numberValue("xp");
-    state.hp.current = numberValue("hpCurrent");
+    state.hp.temp = numberValue("hpTemp");
     state.hp.max = numberValue("hpMax");
-    state.mp.current = numberValue("mpCurrent");
+    state.hp.current = boundedCurrent("hpCurrent", state.hp.max, state.hp.temp);
+    state.mp.temp = numberValue("mpTemp");
     state.mp.max = numberValue("mpMax");
+    state.mp.current = boundedCurrent("mpCurrent", state.mp.max, state.mp.temp);
     state.money.bronze = numberValue("moneyBronze");
     state.money.silver = numberValue("moneySilver");
     state.money.gold = numberValue("moneyGold");
@@ -93,6 +96,15 @@
       defense: calc.number(input(`armorDefense${row}`).value),
       penalty: calc.number(input(`armorPenalty${row}`).value)
     }));
+  }
+
+  function boundedCurrent(name, maximum, temporary) {
+    const field = input(name);
+    const value = clampFieldNumber(field);
+    const limit = Math.max(0, calc.number(maximum) + calc.number(temporary));
+    const clamped = Math.min(value, limit);
+    if (field && value !== clamped) field.value = clamped;
+    return clamped;
   }
 
   function saveAndRender() {
@@ -141,18 +153,19 @@
     renderProficiencies();
     renderAbilities();
     renderEquipment();
+    renderNotes();
   }
 
   function renderAttacks() {
     renderList("#attacksList", state.attacks, "attacks", (item, index) => `
       <article class="dynamic-row attack-row">
-        ${field(`attacks.${index}.name`, "Nome", item.name)}
-        ${field(`attacks.${index}.test`, "Teste", item.test, "text")}
-        ${field(`attacks.${index}.damage`, "Dano", item.damage)}
-        ${field(`attacks.${index}.critical`, "Crítico", item.critical)}
-        ${field(`attacks.${index}.range`, "Alcance", item.range)}
-        ${field(`attacks.${index}.type`, "Tipo", item.type)}
-        ${field(`attacks.${index}.spaces`, "Esp.", item.spaces, "number", { min: 0, max: 999 })}
+        ${field(`attacks.${index}.name`, "Nome", item.name, "text", { grid: true })}
+        ${field(`attacks.${index}.test`, "Teste", item.test, "text", { grid: true })}
+        ${field(`attacks.${index}.damage`, "Dano", item.damage, "text", { grid: true })}
+        ${field(`attacks.${index}.critical`, "Crítico", item.critical, "text", { grid: true })}
+        ${field(`attacks.${index}.range`, "Alcance", item.range, "text", { grid: true })}
+        ${field(`attacks.${index}.type`, "Tipo", item.type, "text", { grid: true })}
+        ${field(`attacks.${index}.spaces`, "Esp.", item.spaces, "number", { min: 0, max: 999, grid: true })}
         ${removeButton("attacks", index)}
       </article>
     `);
@@ -184,13 +197,23 @@
     `);
   }
 
+  function renderNotes() {
+    renderList("#notesList", state.notes, "notes", (item, index) => `
+      <article class="dynamic-row note-row">
+        ${field(`notes.${index}.title`, "Título", item.title)}
+        <label>Texto<textarea data-path="notes.${index}.text">${escapeHtml(item.text || "")}</textarea></label>
+        ${removeButton("notes", index)}
+      </article>
+    `);
+  }
+
   function renderEquipment() {
     renderList("#equipmentList", state.equipment, "equipment", (item, index) => `
       <article class="dynamic-row equipment-row">
-        ${field(`equipment.${index}.name`, "Item", item.name)}
-        ${field(`equipment.${index}.quantity`, "Qtd.", item.quantity, "number", { min: 0, max: 999 })}
-        ${field(`equipment.${index}.spaces`, "Esp.", item.spaces, "number", { min: 0, max: 999 })}
-        ${field(`equipment.${index}.value`, "Valor (PP)", item.value)}
+        ${field(`equipment.${index}.name`, "Item", item.name, "text", { grid: true })}
+        ${field(`equipment.${index}.quantity`, "Qtd.", item.quantity, "number", { min: 0, max: 999, grid: true })}
+        ${field(`equipment.${index}.spaces`, "Esp.", item.spaces, "number", { min: 0, max: 999, grid: true })}
+        ${field(`equipment.${index}.value`, "Valor (PP)", item.value, "text", { grid: true })}
         ${removeButton("equipment", index)}
       </article>
     `);
@@ -205,13 +228,14 @@
     holder.innerHTML = items.map(template).join("");
   }
 
-  function field(path, label, value, type = "text", limits = {}) {
+  function field(path, label, value, type = "text", options = {}) {
     const numberAttrs = type === "number"
-      ? ` min="${limits.min ?? -999}" max="${limits.max ?? 9999}" step="1"`
+      ? ` min="${options.min ?? -999}" max="${options.max ?? 9999}" step="1"`
       : "";
     const hint = labelHints[label];
     const title = hint ? ` title="${escapeAttr(hint)}"` : "";
-    return `<label${title}>${label}<input data-path="${path}" type="${type}"${numberAttrs}${title} value="${escapeAttr(value ?? "")}"></label>`;
+    const className = options.grid ? " class=\"grid-field\"" : "";
+    return `<label${className}${title}><span class="field-label">${label}</span><input data-path="${path}" type="${type}"${numberAttrs}${title} value="${escapeAttr(value ?? "")}"></label>`;
   }
 
   function attributeName(key) {
@@ -245,7 +269,8 @@
       attacks: { name: "", test: "", damage: "", critical: "", range: "", type: "", spaces: 0 },
       proficiencies: { text: "" },
       abilities: { name: "", kind: "Habilidade", cost: "", source: "", description: "", open: true },
-      equipment: { name: "", quantity: 1, spaces: 0, value: "" }
+      equipment: { name: "", quantity: 1, spaces: 0, value: "" },
+      notes: { title: "", text: "" }
     };
     return map[type];
   }
@@ -258,9 +283,13 @@
     setValue("className", state.className);
     setValue("level", state.level);
     setValue("xp", state.xp);
+    state.hp.current = Math.min(calc.number(state.hp.current), calc.number(state.hp.max) + calc.number(state.hp.temp));
+    state.mp.current = Math.min(calc.number(state.mp.current), calc.number(state.mp.max) + calc.number(state.mp.temp));
     setValue("hpCurrent", state.hp.current);
+    setValue("hpTemp", state.hp.temp);
     setValue("hpMax", state.hp.max);
     setValue("mpCurrent", state.mp.current);
+    setValue("mpTemp", state.mp.temp);
     setValue("mpMax", state.mp.max);
     setValue("moneyBronze", state.money.bronze);
     setValue("moneySilver", state.money.silver);
@@ -293,7 +322,7 @@
   function renderTotals() {
     document.querySelector("#halfLevel").value = calc.halfLevel(state.level);
     document.querySelector("#defenseTotal").value = calc.defenseTotal(state);
-    document.querySelector("#loadUsed").value = calc.loadUsed(state);
+    document.querySelector("#loadUsed").value = `${calc.loadUsed(state)} de ${calc.loadLimit(state)}`;
     document.querySelector("#moneyTotal").value = calc.formatPP(calc.moneyTotalPP(state));
     document.querySelectorAll("[data-half-skill]").forEach((item) => {
       item.textContent = calc.halfLevel(state.level);
@@ -382,7 +411,6 @@
 
     document.querySelector("#exportJson").addEventListener("click", exportJson);
     document.querySelector("#importJson").addEventListener("change", (event) => importJson(event.target.files[0]));
-    document.querySelector("#printSheet").addEventListener("click", () => window.print());
     document.querySelector("#clearSheet").addEventListener("click", () => {
       if (!confirm("Limpar a ficha salva neste navegador?")) return;
       storage.clear();

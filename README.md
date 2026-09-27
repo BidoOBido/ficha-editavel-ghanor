@@ -9,11 +9,12 @@ Abra `index.html` em um navegador ou publique a pasta `Ficha Web/` como site est
 - HTML, CSS e JavaScript puro.
 - Salvamento automático em `localStorage`.
 - Exportação e importação de JSON.
-- Modo edição/visualização.
-- Ataques, equipamentos, proficiências e habilidades/magias expansíveis.
+- Ataques, equipamentos, proficiências, anotações e habilidades/magias expansíveis.
 - Cálculo automático de 1/2 nível, perícias, Defesa e carga usada.
+- PV e PM possuem campos atuais, temporários e máximos; o valor atual é limitado a `máximo + temporário`.
 - Campo de XP opcional, limitado pela tabela de progressão de Tormenta20.
 - Dinheiro separado em PB, PP e PO, com total convertido para PP.
+- Carga usada exibida como `x de y`, usando o limite de carga de Ghanor.
 - CSS responsivo e folha de impressão.
 
 ## Fontes de regras
@@ -21,6 +22,7 @@ Abra `index.html` em um navegador ou publique a pasta `Ficha Web/` como site est
 - **[Ghanor]** A ficha foi estruturada a partir da ficha editável de **A Lenda de Ghanor RPG**, incluindo perícias, atributos, Defesa e a fórmula geral `1/2 nível + atributo + treino + outros`.
 - **[Ghanor]** O nível de personagem vai de 1 a 20. O livro de Ghanor indica avanço ao fim de aventuras completadas, sem tabela própria de XP.
 - **[Ghanor]** Preços e dinheiro inicial usam PP como referência. Cobre vale 0,1 PP e ouro vale 10 PP; a interface usa o rótulo PB para a moeda menor, conforme convenção da mesa.
+- **[Ghanor]** O limite de carga usa `10 espaços + 2 por ponto de Força`; Força negativa reduz o limite em 1 espaço por ponto negativo.
 - **[Tormenta20]** O campo de XP é um fallback opcional para mesas que desejem controlar experiência numericamente. Ele usa o intervalo da tabela de Tormenta20, de 0 a 190.000 XP.
 
 ## Observações do MVP

@@ -40,6 +40,11 @@
     }, 0);
   }
 
+  function loadLimit(character) {
+    const strength = number(character.attributes?.for);
+    return 10 + (strength >= 0 ? strength * 2 : strength);
+  }
+
   function moneyTotalPP(character) {
     const money = character.money || {};
     return number(money.bronze) / 10 + number(money.silver) + number(money.gold) * 10;
@@ -57,6 +62,7 @@
     skillTotal,
     defenseTotal,
     loadUsed,
+    loadLimit,
     moneyTotalPP,
     formatPP,
     totalArmorPenalty

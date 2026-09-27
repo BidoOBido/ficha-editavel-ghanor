@@ -56,8 +56,8 @@
         // O campo existe para mesas que usam o fallback de XP de T20: 0 a 190.000.
         xp: 0,
         attributes: { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 },
-        hp: { current: 0, max: 0 },
-        mp: { current: 0, max: 0 },
+        hp: { current: 0, temp: 0, max: 0 },
+        mp: { current: 0, temp: 0, max: 0 },
         defense: {
           base: 10,
           attribute: "des",
@@ -75,6 +75,7 @@
         proficiencies: [],
         abilities: [],
         equipment: [],
+        notes: [],
         // [Ghanor] Preços usam PP como referência. O livro usa PC para cobre;
         // a interface usa PB a pedido da mesa, convertido como 10 PB = 1 PP.
         money: { bronze: 0, silver: 0, gold: 0 }
