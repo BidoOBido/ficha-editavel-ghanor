@@ -6,6 +6,17 @@
   const storage = window.GhanorSheetStorage;
   const form = document.querySelector("#characterSheet");
   const state = mergeCharacter(blankCharacter(), storage.load());
+  const labelHints = {
+    "XP": "Pontos de Experiência",
+    "PV": "Pontos de Vida",
+    "PM": "Pontos de Mana",
+    "Qtd.": "Quantidade",
+    "Esp.": "Espaços",
+    "Valor (PP)": "Valor em Peças de Prata",
+    "PB": "Peças de Bronze",
+    "PP": "Peças de Prata",
+    "PO": "Peças de Ouro"
+  };
 
   function mergeCharacter(base, saved) {
     if (!saved || typeof saved !== "object") return base;
@@ -94,8 +105,8 @@
     const holder = document.querySelector("#attributesList");
     holder.innerHTML = attributes.map((attr) => `
       <label class="attribute-card ornamental" title="${attr.name}">
-        <span>${attr.label}</span>
-        <input name="attr-${attr.key}" type="number" min="-5" max="30" step="1" aria-label="${attr.name}">
+        <span title="${attr.name}">${attr.label}</span>
+        <input name="attr-${attr.key}" type="number" min="-5" max="30" step="1" aria-label="${attr.name}" title="${attr.name}">
       </label>
     `).join("");
 
@@ -115,7 +126,7 @@
           <span class="math">=</span>
           <span class="muted" data-half-skill>0</span>
           <span class="math">+</span>
-          <span class="muted attr-ref">${skill.attr.toUpperCase()}</span>
+          <span class="muted attr-ref" title="${attributeName(skill.attr)}">${skill.attr.toUpperCase()}</span>
           <span class="math">+</span>
           <input data-skill-training="${skill.key}" type="number" min="-99" max="99" step="1" aria-label="Treino em ${skill.name}">
           <span class="math">+</span>
@@ -198,7 +209,13 @@
     const numberAttrs = type === "number"
       ? ` min="${limits.min ?? -999}" max="${limits.max ?? 9999}" step="1"`
       : "";
-    return `<label>${label}<input data-path="${path}" type="${type}"${numberAttrs} value="${escapeAttr(value ?? "")}"></label>`;
+    const hint = labelHints[label];
+    const title = hint ? ` title="${escapeAttr(hint)}"` : "";
+    return `<label${title}>${label}<input data-path="${path}" type="${type}"${numberAttrs}${title} value="${escapeAttr(value ?? "")}"></label>`;
+  }
+
+  function attributeName(key) {
+    return attributes.find((attr) => attr.key === key)?.name || key;
   }
 
   function removeButton(type, index) {

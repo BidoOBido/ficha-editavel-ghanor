@@ -56,7 +56,7 @@
           </div>
 
           <div class="xp-card ornamental">
-            <span>XP</span>
+            <span title="Pontos de Experiência">XP</span>
             <input name="xp" type="number" min="0" max="190000" step="1">
           </div>
         </section>
@@ -71,12 +71,12 @@
             <section class="vitals" aria-labelledby="vitals-title">
               <h2 id="vitals-title" class="sr-only">Pontos de Vida e Mana</h2>
               <article class="vital-card ornamental">
-                <strong>PV</strong>
+                <strong title="Pontos de Vida">PV</strong>
                 <label>Atuais <input name="hpCurrent" type="number" min="0" max="9999" step="1"></label>
                 <label>Máximos <input name="hpMax" type="number" min="0" max="9999" step="1"></label>
               </article>
               <article class="vital-card ornamental">
-                <strong>PM</strong>
+                <strong title="Pontos de Mana">PM</strong>
                 <label>Atuais <input name="mpCurrent" type="number" min="0" max="9999" step="1"></label>
                 <label>Máximos <input name="mpMax" type="number" min="0" max="9999" step="1"></label>
               </article>
@@ -94,7 +94,7 @@
                 <span>Crítico</span>
                 <span>Alcance</span>
                 <span>Tipo</span>
-                <span>Esp.</span>
+                <span title="Espaços">Esp.</span>
               </div>
               <div id="attacksList" class="dynamic-list"></div>
             </section>
@@ -165,10 +165,10 @@
               </div>
               <div id="equipmentList" class="dynamic-list"></div>
               <div class="money-load">
-                <label>PB <input name="moneyBronze" type="number" min="0" max="999999" step="1"></label>
-                <label>PP <input name="moneySilver" type="number" min="0" max="999999" step="1"></label>
-                <label>PO <input name="moneyGold" type="number" min="0" max="999999" step="1"></label>
-                <label class="money-total">Total em PP <output id="moneyTotal">0</output></label>
+                <label title="Peças de Bronze">PB <input name="moneyBronze" type="number" min="0" max="999999" step="1" title="Peças de Bronze"></label>
+                <label title="Peças de Prata">PP <input name="moneySilver" type="number" min="0" max="999999" step="1" title="Peças de Prata"></label>
+                <label title="Peças de Ouro">PO <input name="moneyGold" type="number" min="0" max="999999" step="1" title="Peças de Ouro"></label>
+                <label class="money-total" title="Total convertido para Peças de Prata">Total em PP <output id="moneyTotal">0</output></label>
                 <label>Carga usada <output id="loadUsed">0</output></label>
               </div>
             </section>
