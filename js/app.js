@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const { attributes, skills, blankCharacter } = window.GhanorSheetData;
+  const { attributes, skills, blankCharacter, mergeCharacter } = window.GhanorSheetData;
   const calc = window.GhanorSheetCalculations;
   const storage = window.GhanorSheetStorage;
   const form = document.querySelector("#characterSheet");
@@ -17,39 +17,6 @@
     "PP": "Peças de Prata",
     "PO": "Peças de Ouro"
   };
-
-  function mergeCharacter(base, saved) {
-    if (!saved || typeof saved !== "object") return base;
-    const merged = { ...base, ...saved };
-    merged.attributes = { ...base.attributes, ...(saved.attributes || {}) };
-    merged.hp = { ...base.hp, ...(saved.hp || {}) };
-    merged.mp = { ...base.mp, ...(saved.mp || {}) };
-    merged.defense = { ...base.defense, ...(saved.defense || {}) };
-    if (Array.isArray(saved.defense?.armorRows)) {
-      const armorRow = saved.defense.armorRows[0] || {};
-      const shieldRow = saved.defense.armorRows[1] || {};
-      merged.defense.armor = { ...base.defense.armor, ...armorRow };
-      merged.defense.shield = { ...base.defense.shield, ...shieldRow };
-    } else {
-      merged.defense.armor = { ...base.defense.armor, ...(saved.defense?.armor || {}) };
-      merged.defense.shield = { ...base.defense.shield, ...(saved.defense?.shield || {}) };
-    }
-    if (typeof saved.defense?.armorBonus === "number") merged.defense.armor.defense = saved.defense.armorBonus;
-    if (typeof saved.defense?.shieldBonus === "number") merged.defense.shield.defense = saved.defense.shieldBonus;
-    delete merged.defense.armorRows;
-    delete merged.defense.armorBonus;
-    delete merged.defense.shieldBonus;
-    merged.skills = { ...base.skills, ...(saved.skills || {}) };
-    merged.attacks = Array.isArray(saved.attacks) ? saved.attacks : base.attacks;
-    merged.proficiencies = Array.isArray(saved.proficiencies) ? saved.proficiencies : base.proficiencies;
-    merged.abilities = Array.isArray(saved.abilities) ? saved.abilities : base.abilities;
-    merged.equipment = Array.isArray(saved.equipment) ? saved.equipment : base.equipment;
-    merged.notes = Array.isArray(saved.notes) ? saved.notes : base.notes;
-    merged.money = typeof saved.money === "number"
-      ? { ...base.money, silver: saved.money }
-      : { ...base.money, ...(saved.money || {}) };
-    return merged;
-  }
 
   function input(name) {
     return form.elements[name];
@@ -149,6 +116,7 @@
       const craftInput = skill.customName ? `<input class="skill-custom" data-skill-custom="${skill.key}" type="text" placeholder="especialidade">` : "";
       return `
         <div class="skill-row" data-skill="${skill.key}">
+          <input class="skill-trained" data-skill-trained="${skill.key}" type="checkbox" aria-label="Treinada em ${skill.name}">
           <label class="skill-name">${skill.name}${craftInput}${suffixes}</label>
           <output class="skill-total" data-skill-total="${skill.key}">0</output>
           <span class="math">=</span>
@@ -156,7 +124,7 @@
           <span class="math">+</span>
           <span class="muted attr-ref" title="${attributeName(skill.attr)}">${skill.attr.toUpperCase()}</span>
           <span class="math">+</span>
-          <input data-skill-training="${skill.key}" type="number" min="-99" max="99" step="1" aria-label="Treino em ${skill.name}">
+          <span class="muted" data-skill-training-bonus="${skill.key}">0</span>
           <span class="math">+</span>
           <input data-skill-other="${skill.key}" type="number" min="-99" max="99" step="1" aria-label="Outros em ${skill.name}">
         </div>
@@ -174,7 +142,8 @@
 
   function renderAttacks() {
     renderList("#attacksList", state.attacks, "attacks", (item, index) => `
-      <article class="dynamic-row attack-row">
+      <article class="dynamic-row attack-row" data-row-type="attacks" data-index="${index}">
+        ${rowActions("attacks", index)}
         ${field(`attacks.${index}.name`, "Nome", item.name, "text", { grid: true })}
         ${field(`attacks.${index}.test`, "Teste", item.test, "text", { grid: true })}
         ${field(`attacks.${index}.damage`, "Dano", item.damage, "text", { grid: true })}
@@ -189,7 +158,8 @@
 
   function renderProficiencies() {
     renderList("#proficienciesList", state.proficiencies, "proficiencies", (item, index) => `
-      <article class="dynamic-row simple-row">
+      <article class="dynamic-row simple-row" data-row-type="proficiencies" data-index="${index}">
+        ${rowActions("proficiencies", index)}
         ${field(`proficiencies.${index}.text`, "Descrição", item.text)}
         ${removeButton("proficiencies", index)}
       </article>
@@ -198,34 +168,52 @@
 
   function renderAbilities() {
     renderList("#abilitiesList", state.abilities, "abilities", (item, index) => `
-      <details class="ability-row" ${item.open ? "open" : ""}>
-        <summary>
+      <article class="ability-row ${item.open === false ? "is-collapsed" : ""}" data-row-type="abilities" data-index="${index}">
+        ${rowActions("abilities", index, true, item.open !== false)}
+        <div class="ability-summary">
           ${field(`abilities.${index}.name`, "Nome", item.name)}
           ${field(`abilities.${index}.kind`, "Tipo", item.kind)}
           ${field(`abilities.${index}.cost`, "Custo", item.cost)}
           ${removeButton("abilities", index)}
-        </summary>
+        </div>
         <div class="ability-body">
           ${field(`abilities.${index}.source`, "Origem", item.source)}
           <label>Descrição<textarea data-path="abilities.${index}.description">${escapeHtml(item.description || "")}</textarea></label>
         </div>
-      </details>
+      </article>
     `);
   }
 
   function renderNotes() {
     renderList("#notesList", state.notes, "notes", (item, index) => `
-      <article class="dynamic-row note-row">
-        ${field(`notes.${index}.title`, "Título", item.title)}
-        <label>Texto<textarea data-path="notes.${index}.text">${escapeHtml(item.text || "")}</textarea></label>
-        ${removeButton("notes", index)}
+      <article class="note-item ${item.open === false ? "is-collapsed" : ""}" data-row-type="notes" data-index="${index}">
+        ${rowActions("notes", index, true, item.open !== false)}
+        <div class="dynamic-row note-row">
+          ${field(`notes.${index}.title`, "Título", item.title)}
+          ${removeButton("notes", index)}
+        </div>
+        <label class="note-body">Texto<textarea data-path="notes.${index}.text">${escapeHtml(item.text || "")}</textarea></label>
       </article>
     `);
   }
 
+  function rowActions(type, index, collapsible = false, open = true) {
+    const toggle = collapsible
+      ? `<button type="button" class="icon-button no-print" data-toggle-row="${type}" data-index="${index}" aria-label="${open ? "Colapsar" : "Abrir"}">${open ? "⌄" : "›"}</button>`
+      : "";
+    return `
+      <div class="row-actions no-print">
+        ${toggle}
+        <button type="button" class="icon-button drag-handle" draggable="true" data-drag="${type}" data-index="${index}" aria-label="Reordenar">↕</button>
+        <button type="button" class="icon-button" data-copy="${type}" data-index="${index}" aria-label="Copiar">⧉</button>
+      </div>
+    `;
+  }
+
   function renderEquipment() {
     renderList("#equipmentList", state.equipment, "equipment", (item, index) => `
-      <article class="dynamic-row equipment-row">
+      <article class="dynamic-row equipment-row" data-row-type="equipment" data-index="${index}">
+        ${rowActions("equipment", index)}
         ${field(`equipment.${index}.name`, "Item", item.name, "text", { grid: true })}
         ${field(`equipment.${index}.quantity`, "Qtd.", item.quantity, "number", { min: 0, max: 999, grid: true })}
         ${field(`equipment.${index}.spaces`, "Esp.", item.spaces, "number", { min: 0, max: 999, grid: true })}
@@ -237,6 +225,7 @@
 
   function renderList(selector, items, type, template) {
     const holder = document.querySelector(selector);
+    holder.dataset.listType = type;
     if (!items.length) {
       holder.innerHTML = `<p class="empty">Nenhum registro. Use o botão acima para adicionar.</p>`;
       return;
@@ -323,10 +312,10 @@
     setValue("shieldPenalty", state.defense.shield.penalty);
     skills.forEach((skill) => {
       const entry = state.skills[skill.key] || {};
-      const training = document.querySelector(`[data-skill-training="${skill.key}"]`);
+      const trained = document.querySelector(`[data-skill-trained="${skill.key}"]`);
       const other = document.querySelector(`[data-skill-other="${skill.key}"]`);
       const custom = document.querySelector(`[data-skill-custom="${skill.key}"]`);
-      if (training) training.value = entry.training ?? 0;
+      if (trained) trained.checked = Boolean(entry.trained);
       if (other) other.value = entry.other ?? 0;
       if (custom) custom.value = entry.customName ?? "";
     });
@@ -345,6 +334,8 @@
     });
     skills.forEach((skill) => {
       const total = document.querySelector(`[data-skill-total="${skill.key}"]`);
+      const training = document.querySelector(`[data-skill-training-bonus="${skill.key}"]`);
+      if (training) training.textContent = state.skills[skill.key]?.trained ? calc.trainingBonus(state.level) : 0;
       if (total) total.value = calc.signed(calc.skillTotal(state, skill));
     });
   }
@@ -395,10 +386,10 @@
         renderTotals();
         return;
       }
-      if (target.matches("[data-skill-training], [data-skill-other], [data-skill-custom]")) {
-        const key = target.dataset.skillTraining || target.dataset.skillOther || target.dataset.skillCustom;
+      if (target.matches("[data-skill-trained], [data-skill-other], [data-skill-custom]")) {
+        const key = target.dataset.skillTrained || target.dataset.skillOther || target.dataset.skillCustom;
         state.skills[key] = state.skills[key] || {};
-        if (target.dataset.skillTraining) state.skills[key].training = clampFieldNumber(target);
+        if (target.dataset.skillTrained) state.skills[key].trained = target.checked;
         if (target.dataset.skillOther) state.skills[key].other = clampFieldNumber(target);
         if (target.dataset.skillCustom) state.skills[key].customName = target.value;
         storage.save(state);
@@ -408,22 +399,21 @@
       saveAndRender();
     });
 
-    form.addEventListener("toggle", (event) => {
-      const details = event.target.closest("details.ability-row");
-      if (!details) return;
-      const rows = Array.from(document.querySelectorAll(".ability-row"));
-      const index = rows.indexOf(details);
-      if (state.abilities[index]) state.abilities[index].open = details.open;
-      storage.save(state);
-    }, true);
-
     document.addEventListener("click", (event) => {
       const add = event.target.closest("[data-add]");
       const remove = event.target.closest("[data-remove]");
+      const copy = event.target.closest("[data-copy]");
+      const toggle = event.target.closest("[data-toggle-row]");
       if (add) {
         state[add.dataset.add].push(getEmptyItem(add.dataset.add));
         storage.save(state);
         renderDynamicLists();
+      }
+      if (copy) {
+        copyItem(copy.dataset.copy, Number(copy.dataset.index));
+      }
+      if (toggle) {
+        toggleItem(toggle.dataset.toggleRow, Number(toggle.dataset.index));
       }
       if (remove) {
         state[remove.dataset.remove].splice(Number(remove.dataset.index), 1);
@@ -433,6 +423,45 @@
       }
     });
 
+    document.addEventListener("dragstart", (event) => {
+      const handle = event.target.closest("[data-drag]");
+      if (!handle) return;
+      const row = handle.closest("[data-row-type]");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", `${handle.dataset.drag}:${handle.dataset.index}`);
+      if (row) {
+        row.classList.add("is-dragging");
+        event.dataTransfer.setDragImage(row, 16, 16);
+      }
+    });
+
+    document.addEventListener("dragover", (event) => {
+      const row = event.target.closest("[data-row-type]");
+      if (!row) return;
+      event.preventDefault();
+      document.querySelectorAll(".is-drop-target").forEach((item) => {
+        if (item !== row) item.classList.remove("is-drop-target");
+      });
+      if (!row.classList.contains("is-dragging")) row.classList.add("is-drop-target");
+    });
+
+    document.addEventListener("dragleave", (event) => {
+      const row = event.target.closest("[data-row-type]");
+      if (row && !row.contains(event.relatedTarget)) row.classList.remove("is-drop-target");
+    });
+
+    document.addEventListener("drop", (event) => {
+      const row = event.target.closest("[data-row-type]");
+      if (!row) return;
+      const [type, fromIndex] = event.dataTransfer.getData("text/plain").split(":");
+      if (type !== row.dataset.rowType) return;
+      event.preventDefault();
+      clearDragState();
+      moveItem(type, Number(fromIndex), Number(row.dataset.index));
+    });
+
+    document.addEventListener("dragend", clearDragState);
+
     document.querySelector("#exportJson").addEventListener("click", exportJson);
     document.querySelector("#importJson").addEventListener("change", (event) => importJson(event.target.files[0]));
     document.querySelector("#clearSheet").addEventListener("click", () => {
@@ -441,6 +470,38 @@
       Object.assign(state, blankCharacter());
       bootstrap();
     });
+  }
+
+  function clearDragState() {
+    document.querySelectorAll(".is-dragging, .is-drop-target").forEach((item) => {
+      item.classList.remove("is-dragging", "is-drop-target");
+    });
+  }
+
+  function copyItem(type, index) {
+    const item = state[type]?.[index];
+    if (!item) return;
+    state[type].splice(index + 1, 0, JSON.parse(JSON.stringify(item)));
+    storage.save(state);
+    renderDynamicLists();
+    renderTotals();
+  }
+
+  function toggleItem(type, index) {
+    const item = state[type]?.[index];
+    if (!item) return;
+    item.open = item.open === false;
+    storage.save(state);
+    renderDynamicLists();
+  }
+
+  function moveItem(type, fromIndex, toIndex) {
+    if (!state[type] || fromIndex === toIndex) return;
+    const [item] = state[type].splice(fromIndex, 1);
+    state[type].splice(toIndex, 0, item);
+    storage.save(state);
+    renderDynamicLists();
+    renderTotals();
   }
 
   function bootstrap() {

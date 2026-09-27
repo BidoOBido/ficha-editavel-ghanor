@@ -283,16 +283,20 @@ textarea:focus {
 .equipment-header,
 .attack-row {
   display: grid;
-  grid-template-columns: minmax(160px, 2fr) minmax(72px, 0.8fr) minmax(92px, 1fr) minmax(82px, 0.9fr) minmax(90px, 1fr) minmax(82px, 1fr) minmax(56px, 0.6fr) auto;
+  grid-template-columns: 34px minmax(160px, 2fr) minmax(72px, 0.8fr) minmax(92px, 1fr) minmax(82px, 0.9fr) minmax(90px, 1fr) minmax(82px, 1fr) minmax(56px, 0.6fr) auto;
   gap: 9px;
   align-items: end;
 }
 
 .attack-header,
 .equipment-header {
-  padding: 0 34px 6px 0;
+  padding: 0 34px 6px 43px;
   color: var(--muted);
   font-size: 12px;
+}
+
+.attack-header {
+  grid-template-columns: minmax(160px, 2fr) minmax(72px, 0.8fr) minmax(92px, 1fr) minmax(82px, 0.9fr) minmax(90px, 1fr) minmax(82px, 1fr) minmax(56px, 0.6fr);
 }
 
 .dynamic-list {
@@ -307,11 +311,11 @@ textarea:focus {
 }
 
 .simple-row {
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 34px 1fr auto;
 }
 
 .equipment-row {
-  grid-template-columns: minmax(150px, 2fr) minmax(62px, 0.7fr) minmax(62px, 0.7fr) minmax(84px, 1fr) auto;
+  grid-template-columns: 34px minmax(150px, 2fr) minmax(62px, 0.7fr) minmax(62px, 0.7fr) minmax(84px, 1fr) auto;
 }
 
 .equipment-header {
@@ -336,6 +340,27 @@ textarea:focus {
   background: #efe1c3;
   font-size: 20px;
   line-height: 1;
+}
+
+.row-actions {
+  display: grid;
+  gap: 4px;
+  align-self: start;
+}
+
+.drag-handle {
+  cursor: grab;
+}
+
+.is-dragging {
+  opacity: 0.48;
+  outline: 2px dashed var(--gold);
+  outline-offset: 3px;
+}
+
+.is-drop-target {
+  background: #fff3cf;
+  box-shadow: inset 4px 0 0 var(--gold);
 }
 
 .lower-grid {
@@ -408,11 +433,17 @@ textarea:focus {
 
 .skill-row {
   display: grid;
-  grid-template-columns: minmax(132px, 1.3fr) 46px 12px 28px 14px 40px 14px 40px 14px 40px;
+  grid-template-columns: 22px minmax(132px, 1.3fr) 46px 12px 28px 14px 40px 14px 40px 14px 40px;
   gap: 4px;
   align-items: center;
   min-height: 28px;
   font-size: 13px;
+}
+
+.skill-trained {
+  width: 16px;
+  min-height: 16px;
+  justify-self: center;
 }
 
 .skill-name {
@@ -437,7 +468,7 @@ textarea:focus {
   text-align: center;
 }
 
-.skill-row input {
+.skill-row input:not([type="checkbox"]) {
   min-height: 24px;
   text-align: center;
 }
@@ -461,27 +492,40 @@ textarea:focus {
   min-height: 240px;
 }
 
-.ability-row {
+.ability-row,
+.note-item {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 8px;
   border-bottom: 1px solid #b7aa8d;
   padding: 5px 0;
 }
 
-.ability-row summary {
+.ability-summary {
   display: grid;
   grid-template-columns: 1.4fr 0.7fr 0.55fr auto;
   gap: 8px;
   align-items: end;
-  cursor: pointer;
 }
 
 .ability-body {
   display: grid;
   gap: 8px;
-  padding: 8px 0 4px 18px;
+  grid-column: 2;
+  padding: 8px 0 4px;
+}
+
+.note-body {
+  grid-column: 2;
+}
+
+.is-collapsed .ability-body,
+.is-collapsed .note-body {
+  display: none;
 }
 
 .note-row {
-  grid-template-columns: minmax(160px, 0.6fr) minmax(260px, 1.4fr) auto;
+  grid-template-columns: minmax(160px, 1fr) auto;
 }
 
 .equipment-panel {
@@ -582,7 +626,7 @@ textarea:focus {
   .attack-row,
   .equipment-row,
   .note-row,
-  .ability-row summary,
+  .ability-summary,
   .defense-total {
     grid-template-columns: 1fr 1fr;
   }
@@ -599,6 +643,14 @@ textarea:focus {
   .icon-button {
     width: 100%;
   }
+
+  .attack-row,
+  .equipment-row,
+  .simple-row,
+  .ability-row,
+  .note-item {
+    grid-template-columns: 42px 1fr;
+  }
 }
 
 @media (max-width: 760px) {
@@ -612,7 +664,7 @@ textarea:focus {
   }
 
   .skill-row {
-    grid-template-columns: minmax(132px, 1fr) 48px 14px 28px 14px 42px 14px 42px;
+    grid-template-columns: 22px minmax(132px, 1fr) 48px 14px 28px 14px 42px 14px 42px;
   }
 
   .skill-row .attr-ref,
@@ -638,10 +690,21 @@ textarea:focus {
   .attack-row,
   .equipment-row,
   .note-row,
-  .ability-row summary,
+  .ability-summary,
   .defense-total,
   .right-stack {
     grid-template-columns: 1fr;
+  }
+
+  .simple-row,
+  .ability-row,
+  .note-item {
+    grid-template-columns: 1fr;
+  }
+
+  .ability-body,
+  .note-body {
+    grid-column: 1;
   }
 
   .name-panel label,
@@ -657,7 +720,7 @@ textarea:focus {
   }
 
   .skill-row {
-    grid-template-columns: minmax(0, 1fr) 48px 72px 72px;
+    grid-template-columns: 22px minmax(0, 1fr) 48px 72px 72px;
     gap: 5px 8px;
     padding: 6px 0;
     border-bottom: 1px solid #d7caad;
@@ -669,7 +732,7 @@ textarea:focus {
     display: none;
   }
 
-  .skill-row input {
+  .skill-row input:not([type="checkbox"]) {
     min-height: 32px;
   }
 }

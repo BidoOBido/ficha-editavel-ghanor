@@ -1,7 +1,70 @@
 (function () {
   "use strict";
 
+  const LEGACY_SHEET_VERSION = 0;
+  const CURRENT_SHEET_VERSION = 2;
+
+  function readSheetVersion(character) {
+    if (!character || typeof character !== "object") return LEGACY_SHEET_VERSION;
+    return Number.isInteger(character.sheetVersion) ? character.sheetVersion : LEGACY_SHEET_VERSION;
+  }
+
+  function mergeCharacter(base, saved) {
+    if (!saved || typeof saved !== "object") return base;
+    const savedVersion = readSheetVersion(saved);
+    const merged = { ...base, ...saved };
+    merged.sheetVersion = CURRENT_SHEET_VERSION;
+    if (calcNumber(merged.level) === 1) merged.level = 2;
+    merged.attributes = { ...base.attributes, ...(saved.attributes || {}) };
+    merged.hp = { ...base.hp, ...(saved.hp || {}) };
+    merged.mp = { ...base.mp, ...(saved.mp || {}) };
+    merged.defense = { ...base.defense, ...(saved.defense || {}) };
+    if (Array.isArray(saved.defense?.armorRows)) {
+      const armorRow = saved.defense.armorRows[0] || {};
+      const shieldRow = saved.defense.armorRows[1] || {};
+      merged.defense.armor = { ...base.defense.armor, ...armorRow };
+      merged.defense.shield = { ...base.defense.shield, ...shieldRow };
+    } else {
+      merged.defense.armor = { ...base.defense.armor, ...(saved.defense?.armor || {}) };
+      merged.defense.shield = { ...base.defense.shield, ...(saved.defense?.shield || {}) };
+    }
+    if (typeof saved.defense?.armorBonus === "number") merged.defense.armor.defense = saved.defense.armorBonus;
+    if (typeof saved.defense?.shieldBonus === "number") merged.defense.shield.defense = saved.defense.shieldBonus;
+    delete merged.defense.armorRows;
+    delete merged.defense.armorBonus;
+    delete merged.defense.shieldBonus;
+    merged.skills = migrateSkills({ ...base.skills, ...(saved.skills || {}) }, savedVersion);
+    merged.attacks = Array.isArray(saved.attacks) ? saved.attacks : base.attacks;
+    merged.proficiencies = Array.isArray(saved.proficiencies) ? saved.proficiencies : base.proficiencies;
+    merged.abilities = Array.isArray(saved.abilities) ? saved.abilities : base.abilities;
+    merged.equipment = Array.isArray(saved.equipment) ? saved.equipment : base.equipment;
+    merged.notes = Array.isArray(saved.notes) ? saved.notes : base.notes;
+    merged.money = typeof saved.money === "number"
+      ? { ...base.money, silver: saved.money }
+      : { ...base.money, ...(saved.money || {}) };
+    return merged;
+  }
+
+  function calcNumber(value) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function migrateSkills(skills, savedVersion) {
+    if (savedVersion >= 2) return skills;
+    return Object.fromEntries(Object.entries(skills).map(([key, entry]) => {
+      if (!entry || typeof entry !== "object") return [key, entry];
+      const migrated = { ...entry };
+      if (typeof migrated.trained !== "boolean") migrated.trained = calcNumber(migrated.training) > 0;
+      delete migrated.training;
+      return [key, migrated];
+    }));
+  }
+
   window.GhanorSheetData = {
+    LEGACY_SHEET_VERSION,
+    CURRENT_SHEET_VERSION,
+
     attributes: [
       { key: "for", label: "FOR", name: "Força" },
       { key: "des", label: "DES", name: "Destreza" },
@@ -46,12 +109,13 @@
 
     blankCharacter() {
       return {
+        sheetVersion: CURRENT_SHEET_VERSION,
         playerName: "",
         characterName: "",
         race: "",
         origin: "",
         className: "",
-        level: 1,
+        level: 2,
         // [Tormenta20] Ghanor avança ao fim de aventuras, sem tabela de XP.
         // O campo existe para mesas que usam o fallback de XP de T20: 0 a 190.000.
         xp: 0,
@@ -76,6 +140,9 @@
         // a interface usa PB a pedido da mesa, convertido como 10 PB = 1 PP.
         money: { bronze: 0, silver: 0, gold: 0 }
       };
-    }
+    },
+
+    readSheetVersion,
+    mergeCharacter
   };
 })();

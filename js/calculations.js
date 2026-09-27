@@ -15,6 +15,13 @@
     return Math.floor(Math.max(0, number(level)) / 2);
   }
 
+  function trainingBonus(level) {
+    const numeric = number(level);
+    if (numeric >= 15) return 6;
+    if (numeric >= 7) return 4;
+    return 2;
+  }
+
   function totalArmorPenalty(character) {
     return number(character.defense.armor?.penalty) + number(character.defense.shield?.penalty);
   }
@@ -31,7 +38,7 @@
     const entry = character.skills[skill.key] || {};
     const base = halfLevel(character.level);
     const attr = number(character.attributes[skill.attr]);
-    const training = number(entry.training);
+    const training = entry.trained ? trainingBonus(character.level) : 0;
     const other = number(entry.other);
     const armor = skill.armorPenalty ? totalArmorPenalty(character) : 0;
     return base + attr + training + other + armor;
@@ -67,6 +74,7 @@
     number,
     signed,
     halfLevel,
+    trainingBonus,
     skillTotal,
     defenseTotal,
     armorDefense,
