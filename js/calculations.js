@@ -16,7 +16,15 @@
   }
 
   function totalArmorPenalty(character) {
-    return (character.defense.armorRows || []).reduce((sum, row) => sum + number(row.penalty), 0);
+    return number(character.defense.armor?.penalty) + number(character.defense.shield?.penalty);
+  }
+
+  function armorDefense(character) {
+    return number(character.defense.armor?.defense);
+  }
+
+  function shieldDefense(character) {
+    return number(character.defense.shield?.defense);
   }
 
   function skillTotal(character, skill) {
@@ -31,7 +39,7 @@
 
   function defenseTotal(character) {
     const attr = character.defense.useAttribute ? number(character.attributes[character.defense.attribute]) : 0;
-    return number(character.defense.base) + attr + number(character.defense.armorBonus) + number(character.defense.shieldBonus) + number(character.defense.other);
+    return number(character.defense.base) + attr + armorDefense(character) + shieldDefense(character) + number(character.defense.other);
   }
 
   function loadUsed(character) {
@@ -61,6 +69,8 @@
     halfLevel,
     skillTotal,
     defenseTotal,
+    armorDefense,
+    shieldDefense,
     loadUsed,
     loadLimit,
     moneyTotalPP,

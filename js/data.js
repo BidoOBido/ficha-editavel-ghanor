@@ -62,13 +62,9 @@
           base: 10,
           attribute: "des",
           useAttribute: true,
-          armorBonus: 0,
-          shieldBonus: 0,
           other: 0,
-          armorRows: [
-            { name: "", defense: 0, penalty: 0 },
-            { name: "", defense: 0, penalty: 0 }
-          ]
+          armor: { name: "", defense: 0, penalty: 0 },
+          shield: { name: "", defense: 0, penalty: 0 }
         },
         skills: {},
         attacks: [],

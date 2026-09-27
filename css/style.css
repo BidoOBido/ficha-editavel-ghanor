@@ -351,11 +351,18 @@ textarea:focus {
   align-items: end;
 }
 
-.defense-total output {
+.defense-total .defense-score {
   min-height: 64px;
   border: 2px solid var(--gold);
   font-size: 44px;
   text-align: center;
+}
+
+.defense-total label output {
+  min-height: 30px;
+  border-bottom: 2px solid var(--line);
+  padding: 4px 5px;
+  color: var(--ink);
 }
 
 .defense-total span {

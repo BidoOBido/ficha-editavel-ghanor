@@ -102,7 +102,7 @@
               <section class="defense-block panel" aria-labelledby="defense-title">
                 <h2 id="defense-title">Defesa</h2>
                 <div class="defense-total">
-                  <output id="defenseTotal">10</output>
+                  <output id="defenseTotal" class="defense-score">10</output>
                   <span>=</span>
                   <label>Base <input name="defenseBase" type="number" min="0" max="99" step="1"></label>
                   <span>+</span>
@@ -111,9 +111,9 @@
                     <select name="defenseAttribute"></select>
                   </label>
                   <span>+</span>
-                  <label>Armadura <input name="armorBonus" type="number" min="-99" max="99" step="1"></label>
+                  <label>Armadura <output id="armorBonusTotal">0</output></label>
                   <span>+</span>
-                  <label>Escudo <input name="shieldBonus" type="number" min="-99" max="99" step="1"></label>
+                  <label>Escudo <output id="shieldBonusTotal">0</output></label>
                   <span>+</span>
                   <label>Outros <input name="defenseOther" type="number" min="-99" max="99" step="1"></label>
                 </div>
@@ -122,13 +122,14 @@
                   Somar atributo selecionado na Defesa
                 </label>
                 <div class="armor-lines">
-                  <label>Armadura/Escudo <input name="armorName1" type="text"></label>
-                  <label>Defesa <input name="armorDefense1" type="number" min="0" max="99" step="1"></label>
-                  <label>Penalidade <input name="armorPenalty1" type="number" min="-99" max="0" step="1"></label>
-                  <label>Armadura/Escudo <input name="armorName2" type="text"></label>
-                  <label>Defesa <input name="armorDefense2" type="number" min="0" max="99" step="1"></label>
-                  <label>Penalidade <input name="armorPenalty2" type="number" min="-99" max="0" step="1"></label>
+                  <label>Armadura <input name="armorName" type="text"></label>
+                  <label>Defesa <input name="armorDefense" type="number" min="0" max="99" step="1"></label>
+                  <label>Penalidade <input name="armorPenalty" type="number" min="-99" max="0" step="1"></label>
+                  <label>Escudo <input name="shieldName" type="text"></label>
+                  <label>Defesa <input name="shieldDefense" type="number" min="0" max="99" step="1"></label>
+                  <label>Penalidade <input name="shieldPenalty" type="number" min="-99" max="0" step="1"></label>
                 </div>
+                <p class="source-note">Bônus de armadura e escudo se acumulam na Defesa; penalidades de ambos se acumulam nas perícias indicadas.</p>
               </section>
 
               <section class="panel" aria-labelledby="proficiencies-title">

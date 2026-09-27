@@ -25,7 +25,20 @@
     merged.hp = { ...base.hp, ...(saved.hp || {}) };
     merged.mp = { ...base.mp, ...(saved.mp || {}) };
     merged.defense = { ...base.defense, ...(saved.defense || {}) };
-    merged.defense.armorRows = saved.defense?.armorRows || base.defense.armorRows;
+    if (Array.isArray(saved.defense?.armorRows)) {
+      const armorRow = saved.defense.armorRows[0] || {};
+      const shieldRow = saved.defense.armorRows[1] || {};
+      merged.defense.armor = { ...base.defense.armor, ...armorRow };
+      merged.defense.shield = { ...base.defense.shield, ...shieldRow };
+    } else {
+      merged.defense.armor = { ...base.defense.armor, ...(saved.defense?.armor || {}) };
+      merged.defense.shield = { ...base.defense.shield, ...(saved.defense?.shield || {}) };
+    }
+    if (typeof saved.defense?.armorBonus === "number") merged.defense.armor.defense = saved.defense.armorBonus;
+    if (typeof saved.defense?.shieldBonus === "number") merged.defense.shield.defense = saved.defense.shieldBonus;
+    delete merged.defense.armorRows;
+    delete merged.defense.armorBonus;
+    delete merged.defense.shieldBonus;
     merged.skills = { ...base.skills, ...(saved.skills || {}) };
     merged.attacks = Array.isArray(saved.attacks) ? saved.attacks : base.attacks;
     merged.proficiencies = Array.isArray(saved.proficiencies) ? saved.proficiencies : base.proficiencies;
@@ -88,14 +101,17 @@
     state.defense.base = numberValue("defenseBase");
     state.defense.attribute = input("defenseAttribute").value;
     state.defense.useAttribute = input("useAttributeInDefense").checked;
-    state.defense.armorBonus = numberValue("armorBonus");
-    state.defense.shieldBonus = numberValue("shieldBonus");
     state.defense.other = numberValue("defenseOther");
-    state.defense.armorRows = [1, 2].map((row) => ({
-      name: input(`armorName${row}`).value,
-      defense: calc.number(input(`armorDefense${row}`).value),
-      penalty: calc.number(input(`armorPenalty${row}`).value)
-    }));
+    state.defense.armor = {
+      name: input("armorName").value,
+      defense: numberValue("armorDefense"),
+      penalty: numberValue("armorPenalty")
+    };
+    state.defense.shield = {
+      name: input("shieldName").value,
+      defense: numberValue("shieldDefense"),
+      penalty: numberValue("shieldPenalty")
+    };
   }
 
   function boundedCurrent(name, maximum, temporary) {
@@ -298,15 +314,13 @@
     setValue("defenseBase", state.defense.base);
     setValue("defenseAttribute", state.defense.attribute);
     setValue("useAttributeInDefense", state.defense.useAttribute);
-    setValue("armorBonus", state.defense.armorBonus);
-    setValue("shieldBonus", state.defense.shieldBonus);
     setValue("defenseOther", state.defense.other);
-    [0, 1].forEach((index) => {
-      const row = state.defense.armorRows[index] || {};
-      setValue(`armorName${index + 1}`, row.name);
-      setValue(`armorDefense${index + 1}`, row.defense);
-      setValue(`armorPenalty${index + 1}`, row.penalty);
-    });
+    setValue("armorName", state.defense.armor.name);
+    setValue("armorDefense", state.defense.armor.defense);
+    setValue("armorPenalty", state.defense.armor.penalty);
+    setValue("shieldName", state.defense.shield.name);
+    setValue("shieldDefense", state.defense.shield.defense);
+    setValue("shieldPenalty", state.defense.shield.penalty);
     skills.forEach((skill) => {
       const entry = state.skills[skill.key] || {};
       const training = document.querySelector(`[data-skill-training="${skill.key}"]`);
@@ -322,6 +336,8 @@
   function renderTotals() {
     document.querySelector("#halfLevel").value = calc.halfLevel(state.level);
     document.querySelector("#defenseTotal").value = calc.defenseTotal(state);
+    document.querySelector("#armorBonusTotal").value = calc.armorDefense(state);
+    document.querySelector("#shieldBonusTotal").value = calc.shieldDefense(state);
     document.querySelector("#loadUsed").value = `${calc.loadUsed(state)} de ${calc.loadLimit(state)}`;
     document.querySelector("#moneyTotal").value = calc.formatPP(calc.moneyTotalPP(state));
     document.querySelectorAll("[data-half-skill]").forEach((item) => {
