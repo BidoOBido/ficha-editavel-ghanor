@@ -21,7 +21,7 @@ body {
   margin: 0;
   color: var(--ink);
   background: #d8d0bd;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Fira Code", "Cascadia Code", "Cascadia Mono", "DejaVu Sans Mono", "Liberation Mono", monospace;
 }
 
 button,
@@ -93,6 +93,34 @@ button:hover,
   background: #6c4e1c;
 }
 
+.button-link,
+.fixed-page-link {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #c8a047;
+  border-radius: 4px;
+  padding: 7px 12px;
+  color: #fff8e8;
+  background: #5a4016;
+  text-decoration: none;
+}
+
+.button-link:hover,
+.fixed-page-link:hover {
+  background: #6c4e1c;
+}
+
+.fixed-page-link {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 30;
+  min-width: 92px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+}
+
 .danger {
   border-color: #b06448;
   background: #653226;
@@ -107,6 +135,54 @@ button:hover,
 
 .sheet-shell {
   padding: 24px clamp(12px, 2vw, 28px) 48px;
+}
+
+.about-shell {
+  padding: 24px clamp(14px, 3vw, 42px) 72px;
+}
+
+.about-page {
+  width: min(1040px, 100%);
+  margin: 0 auto;
+  padding: clamp(20px, 3vw, 36px);
+  border: 1px solid #c8b98e;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.about-section + .about-section {
+  margin-top: 28px;
+}
+
+.about-section h2 {
+  margin: 0 0 10px;
+  color: #5a4016;
+  font-size: 22px;
+}
+
+.about-section p,
+.about-section li {
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.about-section p {
+  margin: 0 0 12px;
+}
+
+.about-section ul {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.about-section li + li {
+  margin-top: 7px;
+}
+
+.about-section a {
+  color: #5a4016;
+  font-weight: 700;
 }
 
 .sheet {
@@ -760,6 +836,7 @@ textarea:focus {
   }
 
   .toolbar button,
+  .toolbar .button-link,
   .file-button {
     flex: 1 1 150px;
   }
@@ -775,6 +852,12 @@ textarea:focus {
 }
 
 @media (max-width: 620px) {
+  .fixed-page-link {
+    right: 12px;
+    bottom: 12px;
+    min-width: 84px;
+  }
+
   .sheet-shell {
     padding: 0;
   }
@@ -901,3 +984,5 @@ textarea:focus {
     break-inside: avoid;
   }
 }
+
+
