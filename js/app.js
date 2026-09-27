@@ -354,11 +354,19 @@
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    const name = state.characterName ? state.characterName.toLowerCase().replace(/[^a-z0-9]+/gi, "-") : "ficha-ghanor";
     link.href = url;
-    link.download = `${name}.json`;
+    link.download = `${filePart(state.playerName, "jogador")}_${filePart(state.characterName, "personagem")}_nivel_${calc.number(state.level) || 1}.json`;
     link.click();
     URL.revokeObjectURL(url);
+  }
+
+  function filePart(value, fallback) {
+    return String(value || fallback)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "") || fallback;
   }
 
   function importJson(file) {
