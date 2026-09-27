@@ -141,3 +141,50 @@ test("magias de quinto circulo sao preservadas", () => {
 
   assert.equal(imported.spells[0].circle, 5);
 });
+
+test("importacao ignora chaves de poluicao de prototipo", () => {
+  const data = loadData();
+  const malicious = JSON.parse('{"__proto__":{"polluted":true},"skills":{"__proto__":{"polluted":true},"melee":{"trained":true}}}');
+  const imported = data.mergeCharacter(data.blankCharacter(), malicious);
+
+  assert.equal({}.polluted, undefined);
+  assert.equal(imported.polluted, undefined);
+  assert.equal(imported.skills.polluted, undefined);
+  assert.equal(imported.skills.melee.trained, true);
+});
+
+test("importacao limita listas e campos longos", () => {
+  const data = loadData();
+  const longText = "x".repeat(6000);
+  const imported = data.mergeCharacter(data.blankCharacter(), {
+    notes: Array.from({ length: 250 }, () => ({ title: longText, text: longText }))
+  });
+
+  assert.equal(imported.notes.length, 200);
+  assert.equal(imported.notes[0].title.length, 200);
+  assert.equal(imported.notes[0].text.length, 5000);
+});
+
+test("importacao limita numeros ao intervalo da interface", () => {
+  const data = loadData();
+  const imported = data.mergeCharacter(data.blankCharacter(), {
+    level: 999,
+    xp: -10,
+    attributes: { for: 999 },
+    hp: { current: -1, temp: 99999, max: 99999 },
+    defense: { base: -10, other: 999, armor: { defense: 999, penalty: 999 } },
+    money: { bronze: -1, silver: 9999999, gold: 10 }
+  });
+
+  assert.equal(imported.level, 20);
+  assert.equal(imported.xp, 0);
+  assert.equal(imported.attributes.for, 30);
+  assert.equal(imported.hp.current, 0);
+  assert.equal(imported.hp.temp, 9999);
+  assert.equal(imported.defense.base, 0);
+  assert.equal(imported.defense.other, 99);
+  assert.equal(imported.defense.armor.defense, 99);
+  assert.equal(imported.defense.armor.penalty, 0);
+  assert.equal(imported.money.bronze, 0);
+  assert.equal(imported.money.silver, 999999);
+});
