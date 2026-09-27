@@ -180,6 +180,11 @@ button:hover,
   height: 18px;
 }
 
+.icon-button .material-icon {
+  width: 16px;
+  height: 16px;
+}
+
 .about-section p,
 .about-section li {
   color: var(--ink);
@@ -1009,5 +1014,4 @@ textarea:focus {
     break-inside: avoid;
   }
 }
-
 
